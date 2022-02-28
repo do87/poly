@@ -1,19 +1,14 @@
 package plan
 
+import "github.com/do87/poly/sdk/job"
+
 type Plan struct {
 	Type string
 	Key  string
 	Name string
+	Jobs []*job.Job
 }
-
-type Job func() (Job, error)
 
 func New() *Plan {
 	return &Plan{}
-}
-
-func (p *Plan) Start() Job {
-	return func() (Job, error) {
-		return nil, nil
-	}
 }

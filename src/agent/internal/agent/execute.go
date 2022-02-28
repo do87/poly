@@ -6,13 +6,12 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/do87/poly/sdk/plan"
+	"github.com/do87/poly/sdk/job"
 )
 
-// execute initiates a plan run
-func (a *agent) execute(ctx context.Context, p *plan.Plan) error {
-	<-a.run
-	defer func() { delete(a.plans, p.Key) }()
+// execJob executes steps in a job
+func (a *agent) execJob(ctx context.Context, result chan run, j *job.Job) error {
+	defer func() { delete(a.plans, j.Key) }()
 
 	var err error
 	ch := make(chan error)
@@ -22,11 +21,11 @@ func (a *agent) execute(ctx context.Context, p *plan.Plan) error {
 				ch <- fmt.Errorf("panic: %v", err)
 			}
 		}()
-		for job := p.Start(); job != nil; {
+		for step := j.Get(); step != nil; {
 			if err = ctx.Err(); err != nil {
 				ch <- err
 			}
-			if job, err = job(); err != nil {
+			if step, err = step(); err != nil {
 				ch <- err
 			}
 		}

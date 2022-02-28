@@ -7,6 +7,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/do87/poly/sdk/job"
 	"github.com/do87/poly/sdk/plan"
 )
 
@@ -14,7 +15,11 @@ import (
 type agent struct {
 	config Config
 	plans  map[string]*plan.Plan
-	run    chan string
+}
+
+type run struct {
+	job *job.Job
+	err error
 }
 
 // Config holds the agent's configuration
@@ -26,9 +31,7 @@ type Config struct {
 
 // New returns a new agent service
 func New(c Config) *agent {
-	a := &agent{
-		run: make(chan string),
-	}
+	a := &agent{}
 	return a.setConfig(c)
 }
 
@@ -67,7 +70,29 @@ func (a *agent) findPlanRequests(ctx context.Context) {
 	{
 		p := plan.New()
 		a.plans[p.Key] = p
-		a.run <- p.Key
-		go a.execute(ctx, p)
+		a.runJobs(ctx, p.Jobs)
+
 	}
+}
+
+func (a *agent) runJobs(ctx context.Context, jobs []*job.Job) error {
+	numJobs := len(jobs)
+	var results chan run = make(chan run, numJobs)
+
+	for _, job := range jobs {
+		go a.execJob(ctx, results, job)
+	}
+
+	for i := 0; i < numJobs; i++ {
+		res := <-results
+		if res.err != nil {
+			return res.err
+		}
+
+		if len(res.job.Children) > 0 {
+			return a.runJobs(ctx, res.job.Children)
+		}
+	}
+
+	return nil
 }
