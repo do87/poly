@@ -8,17 +8,22 @@ import (
 	"time"
 )
 
+// Tree is the polytree handler
 type Tree struct {
-	Type        string
-	Key         string
-	Nodes       []*Node
-	SeenNodes   map[string]bool
-	Errors      map[string]error
-	Timeout     time.Duration
+	Type    string
+	Key     string
+	Nodes   []*Node
+	Timeout time.Duration
+	Meta    interface{}
+
+	// internal
+	seenNodes   map[string]bool
+	errors      map[string]error
 	pendingRun  []*Node
 	pendingLock *sync.Mutex
 }
 
+// Node is a node in the polytree
 type Node struct {
 	Type     string
 	Key      string
@@ -26,7 +31,6 @@ type Node struct {
 	Children []*Node
 	Exec     Exec
 	Error    error
-	Meta     interface{}
 }
 
 type Exec func(ctx context.Context) (Exec, error)
@@ -35,6 +39,22 @@ func New() *Tree {
 	return &Tree{
 		Timeout: 1 * time.Hour,
 	}
+}
+
+// AddNode adds a node to the polytree
+func (t *Tree) AddNode(planType, planKey string, exec Exec) *Node {
+	return &Node{
+		Type: planType,
+		Key:  planKey,
+		Exec: Exec(exec),
+	}
+}
+
+// AddDependency creates dependencies between nodes
+func (t *Tree) AddDependency(parent, child *Node) *Tree {
+	parent.Children = append(parent.Children, child)
+	child.Parents = append(child.Parents, parent)
+	return t
 }
 
 func (t *Tree) execNode(ctx context.Context, node *Node, done chan *Node) {
@@ -92,7 +112,7 @@ func (t *Tree) execNode(ctx context.Context, node *Node, done chan *Node) {
 func (t *Tree) shouldNodeRun(ctx context.Context, cancel context.CancelFunc, node *Node) bool {
 	for {
 		// don't run node if there are errors
-		if len(t.Errors) > 0 {
+		if len(t.errors) > 0 {
 			cancel()
 			node.Error = errors.New("execution skipped")
 			t.setSeen(node)
@@ -126,6 +146,7 @@ func (t *Tree) shouldNodeRun(ctx context.Context, cancel context.CancelFunc, nod
 func (t *Tree) Execute(ctx context.Context) {
 	t.pendingRun = t.getTopNodes()
 	t.execute(ctx)
+	t.cleanup()
 }
 
 // execute runs all pending nodes
@@ -174,15 +195,15 @@ PLOOP:
 
 // setSeen marks a node as completed / seen
 func (t *Tree) setSeen(n *Node) {
-	t.SeenNodes[n.Key] = true
+	t.seenNodes[n.Key] = true
 	if n.Error != nil {
-		t.Errors[n.Key] = n.Error
+		t.errors[n.Key] = n.Error
 	}
 }
 
 // isSeen returns true if node completed
 func (t *Tree) isSeen(n *Node) bool {
-	v, ok := t.SeenNodes[n.Key]
+	v, ok := t.seenNodes[n.Key]
 	return ok && v
 }
 
@@ -195,4 +216,10 @@ func (t *Tree) getTopNodes() []*Node {
 		}
 	}
 	return n
+}
+
+func (t *Tree) cleanup() {
+	t.seenNodes = map[string]bool{}
+	t.errors = map[string]error{}
+	t.pendingRun = []*Node{}
 }
