@@ -6,6 +6,8 @@ import (
 	"os/signal"
 	"syscall"
 	"time"
+
+	"github.com/do87/poly/src/agent/internal/polytree"
 )
 
 // agent is the agent service
@@ -60,7 +62,8 @@ func (a *agent) Run(ctx context.Context) {
 // findPlanRequests checks api for new plan requests
 func (a *agent) findPlanRequests(ctx context.Context) {
 	{
-
+		p := polytree.New()
+		p.Execute(ctx)
 	}
 }
 

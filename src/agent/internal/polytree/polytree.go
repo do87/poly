@@ -16,7 +16,7 @@ type Tree struct {
 	Errors      map[string]error
 	Timeout     time.Duration
 	pendingRun  []*Node
-	pendingLock sync.Mutex
+	pendingLock *sync.Mutex
 }
 
 type Node struct {
@@ -26,6 +26,7 @@ type Node struct {
 	Children []*Node
 	Exec     Exec
 	Error    error
+	Meta     interface{}
 }
 
 type Exec func(ctx context.Context) (Exec, error)
