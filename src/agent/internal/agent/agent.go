@@ -12,46 +12,41 @@ import (
 
 // agent is the agent service
 type agent struct {
-	config Config
+	MaxParallel  uint8         // Max plans running in parallel
+	PlanTimeout  time.Duration // Max time for running plans
+	PollInterval time.Duration // how often should the API be checked for new plan runs
+	plans        map[string]*Plan
+	tags         Tags
 }
 
-// Config holds the agent's configuration
-type Config struct {
-	MaxParallel uint8         // Max plans running in parallel
-	PlanTimeout time.Duration // Max time for running plans
-	Ticker      time.Duration // how often should the API be checked for new plan runs
-}
+type Plan polytree.Tree
+type Tags map[string]string
 
-// New returns a new agent service
-func New(c Config) *agent {
-	a := &agent{}
-	return a.setConfig(c)
-}
+// Register creates a new worker and sets its tags and plans
+func Register(tags Tags, plans ...*Plan) *agent {
+	a := &agent{
+		MaxParallel:  3,
+		PlanTimeout:  2 * time.Hour,
+		PollInterval: 5 * time.Second,
+		plans:        map[string]*Plan{},
+		tags:         tags,
+	}
 
-// setConfig sets the agent configuration with the given config
-// and sets default values if not specified
-func (a *agent) setConfig(c Config) *agent {
-	if c.Ticker == 0 {
-		c.Ticker = 5 * time.Second
+	// add plans by their keys
+	for _, plan := range plans {
+		a.plans[plan.Key] = plan
 	}
-	if c.MaxParallel == 0 {
-		c.MaxParallel = 3
-	}
-	if c.PlanTimeout == 0 {
-		c.Ticker = 2 * time.Hour
-	}
-	a.config = c
 	return a
 }
 
 // Run runs the agent
 func (a *agent) Run(ctx context.Context) {
 	ctx, stop := signal.NotifyContext(ctx, os.Interrupt, syscall.SIGTERM)
-	ticker := time.NewTicker(a.config.Ticker)
+	ticker := time.NewTicker(a.PollInterval)
 
 	select {
 	case <-ticker.C:
-		a.findPlanRequests(ctx)
+		a.poll(ctx)
 		return
 	case <-ctx.Done():
 		a.eol(stop)
@@ -59,17 +54,20 @@ func (a *agent) Run(ctx context.Context) {
 	}
 }
 
-// findPlanRequests checks api for new plan requests
-func (a *agent) findPlanRequests(ctx context.Context) {
-	{
-		p := polytree.New()
-		p.Execute(ctx)
+// poll checks api for new plan requests
+func (a *agent) poll(ctx context.Context) {
+	request := "plan1" // TODO
+	if plan := a.processRequest(request); plan != nil {
+		pt := (*polytree.Tree)(plan)
+		pt.Execute(ctx) // TODO: check parallelism, Add timeout
 	}
 }
 
-// handlePostrun handles operation following a plan run
-func (a *agent) postrun(ctx context.Context, planKey string) {
-
-	// run failed
-
+func (a *agent) processRequest(planRequest string) *Plan {
+	for _, plan := range a.plans {
+		if plan.Key == planRequest {
+			return plan
+		}
+	}
+	return nil
 }

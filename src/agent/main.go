@@ -7,5 +7,8 @@ import (
 )
 
 func main() {
-	agent.New(agent.Config{}).Run(context.Background())
+	ctx := context.Background()
+	agent.Register(agent.Tags{
+		"infra": "prod",
+	}).Run(ctx)
 }
