@@ -46,14 +46,14 @@ func (a *agent) setConfig(c Config) *agent {
 }
 
 // Run runs the agent
-func (a *agent) Run() {
-	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
+func (a *agent) Run(ctx context.Context) {
+	ctx, stop := signal.NotifyContext(ctx, os.Interrupt, syscall.SIGTERM)
 	ticker := time.NewTicker(a.config.Ticker)
 
 	select {
 	case <-ticker.C:
 		if len(a.plans) < int(a.config.MaxParallel) {
-			a.findPlanRequests()
+			a.findPlanRequests(ctx)
 		}
 		return
 	case <-ctx.Done():
@@ -63,11 +63,11 @@ func (a *agent) Run() {
 }
 
 // findPlanRequests checks api for new plan requests
-func (a *agent) findPlanRequests() {
+func (a *agent) findPlanRequests(ctx context.Context) {
 	{
 		p := plan.New()
 		a.plans[p.Key] = p
 		a.run <- p.Key
-		go a.execute(p)
+		go a.execute(ctx, p)
 	}
 }

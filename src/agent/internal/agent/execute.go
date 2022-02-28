@@ -1,6 +1,7 @@
 package agent
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"time"
@@ -9,7 +10,7 @@ import (
 )
 
 // execute initiates a plan run
-func (a *agent) execute(p *plan.Plan) error {
+func (a *agent) execute(ctx context.Context, p *plan.Plan) error {
 	<-a.run
 	defer func() { delete(a.plans, p.Key) }()
 
@@ -22,6 +23,9 @@ func (a *agent) execute(p *plan.Plan) error {
 			}
 		}()
 		for job := p.Start(); job != nil; {
+			if err = ctx.Err(); err != nil {
+				ch <- err
+			}
 			if job, err = job(); err != nil {
 				ch <- err
 			}
