@@ -26,6 +26,16 @@ type agent struct {
 type Plan polytree.Tree
 type Tags map[string]string
 
+func (a *agent) execute(ctx context.Context, plan *Plan) {
+	t := (*polytree.Tree)(plan)
+	t.ExecuteWithTimeout(ctx, a.PlanTimeout)
+	a.save(ctx, plan)
+}
+
+func (a *agent) save(ctx context.Context, plan *Plan) *agent { // TODO
+	return a
+}
+
 // Register creates a new worker and sets its tags and plans
 func Register(tags Tags, plans ...*Plan) *agent {
 	a := &agent{
@@ -61,30 +71,30 @@ func (a *agent) Run(ctx context.Context) {
 // poll checks api for new plan requests
 func (a *agent) poll(ctx context.Context) {
 	request := "plan1" // TODO
-	if plan := a.processRequest(request); plan != nil {
-		pt := (*polytree.Tree)(plan)
-		pt.Execute(ctx) // TODO: check parallelism, Add timeout
-	}
+	a.processRequest(ctx, request)
 }
 
 // processRequest find plan keys that match the request
-func (a *agent) processRequest(planRequest string) (found *Plan) {
-	for _, plan := range a.plans {
-		if strings.EqualFold(plan.Key, planRequest) {
-			found = plan
+func (a *agent) processRequest(ctx context.Context, planRequest string) {
+	var plan *Plan
+	for _, p := range a.plans {
+		if strings.EqualFold(p.Key, planRequest) {
+			plan = p
 			break
 		}
 	}
 
-	if found == nil {
+	if plan == nil {
+		return
+	}
+
+	if len(a.running) >= a.MaxParallel {
 		return
 	}
 
 	a.runLock.Lock()
-	if len(a.running) <= a.MaxParallel {
-		a.running = append(a.running, found.Key)
-	}
+	a.running = append(a.running, plan.Key)
 	a.runLock.Unlock()
 
-	return
+	a.execute(ctx, plan)
 }

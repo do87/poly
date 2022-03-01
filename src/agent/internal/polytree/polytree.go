@@ -149,6 +149,14 @@ func (t *Tree) Execute(ctx context.Context) {
 	t.cleanup()
 }
 
+// ExecuteWithTimeout is used to execute each polytree node.Exec function, with a global run timeout
+func (t *Tree) ExecuteWithTimeout(ctx context.Context, timeout time.Duration) {
+	ctxWrap, cancel := context.WithTimeout(ctx, timeout)
+	t.pendingRun = t.getTopNodes()
+	t.execute(ctxWrap)
+	t.cleanup(cancel)
+}
+
 // execute runs all pending nodes
 func (t *Tree) execute(ctx context.Context) {
 	if len(t.pendingRun) == 0 {
@@ -218,8 +226,11 @@ func (t *Tree) getTopNodes() []*Node {
 	return n
 }
 
-func (t *Tree) cleanup() {
+func (t *Tree) cleanup(cancel ...context.CancelFunc) {
 	t.seenNodes = map[string]bool{}
 	t.errors = map[string]error{}
 	t.pendingRun = []*Node{}
+	for _, c := range cancel {
+		c()
+	}
 }
