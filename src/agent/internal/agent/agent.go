@@ -4,6 +4,8 @@ import (
 	"context"
 	"os"
 	"os/signal"
+	"strings"
+	"sync"
 	"syscall"
 	"time"
 
@@ -12,11 +14,13 @@ import (
 
 // agent is the agent service
 type agent struct {
-	MaxParallel  uint8         // Max plans running in parallel
-	PlanTimeout  time.Duration // Max time for running plans
-	PollInterval time.Duration // how often should the API be checked for new plan runs
-	plans        map[string]*Plan
-	tags         Tags
+	MaxParallel  int              // Max plans running in parallel
+	PlanTimeout  time.Duration    // Max time for running plans
+	PollInterval time.Duration    // how often should the API be checked for new plan runs
+	plans        map[string]*Plan // map of plan keys pointing to plans supported by the worker
+	tags         Tags             // worker tags for filtering requests
+	running      []string         // list of keys of running plans
+	runLock      sync.Mutex
 }
 
 type Plan polytree.Tree
@@ -63,11 +67,24 @@ func (a *agent) poll(ctx context.Context) {
 	}
 }
 
-func (a *agent) processRequest(planRequest string) *Plan {
+// processRequest find plan keys that match the request
+func (a *agent) processRequest(planRequest string) (found *Plan) {
 	for _, plan := range a.plans {
-		if plan.Key == planRequest {
-			return plan
+		if strings.EqualFold(plan.Key, planRequest) {
+			found = plan
+			break
 		}
 	}
-	return nil
+
+	if found == nil {
+		return
+	}
+
+	a.runLock.Lock()
+	if len(a.running) <= a.MaxParallel {
+		a.running = append(a.running, found.Key)
+	}
+	a.runLock.Unlock()
+
+	return
 }
