@@ -18,16 +18,17 @@ type agent struct {
 	PlanTimeout  time.Duration    // Max time for running plans
 	PollInterval time.Duration    // how often should the API be checked for new plan runs
 	plans        map[string]*Plan // map of plan keys pointing to plans supported by the worker
-	tags         Tags             // worker tags for filtering requests
+	labels       Labels           // worker tags for filtering requests
 	running      []string         // list of keys of running plans
 	runLock      sync.Mutex
 }
 
 type Plan polytree.Tree
-type Tags map[string]string
+type Labels map[string]string
 
-func (a *agent) execute(ctx context.Context, plan *Plan) {
+func (a *agent) execute(ctx context.Context, plan *Plan, payload []byte) {
 	t := (*polytree.Tree)(plan)
+	t.Payload = payload
 	t.ExecuteWithTimeout(ctx, a.PlanTimeout)
 	a.save(ctx, plan)
 }
@@ -37,13 +38,13 @@ func (a *agent) save(ctx context.Context, plan *Plan) *agent { // TODO
 }
 
 // Register creates a new worker and sets its tags and plans
-func Register(tags Tags, plans ...*Plan) *agent {
+func Register(labels Labels, plans ...*Plan) *agent {
 	a := &agent{
 		MaxParallel:  3,
 		PlanTimeout:  2 * time.Hour,
 		PollInterval: 5 * time.Second,
 		plans:        map[string]*Plan{},
-		tags:         tags,
+		labels:       labels,
 	}
 
 	// add plans by their keys
@@ -71,11 +72,12 @@ func (a *agent) Run(ctx context.Context) {
 // poll checks api for new plan requests
 func (a *agent) poll(ctx context.Context) {
 	request := "plan1" // TODO
-	a.processRequest(ctx, request)
+	payload := []byte(`{"hello": "world"}`)
+	a.processRequest(ctx, request, payload)
 }
 
 // processRequest find plan keys that match the request
-func (a *agent) processRequest(ctx context.Context, planRequest string) {
+func (a *agent) processRequest(ctx context.Context, planRequest string, payload []byte) {
 	var plan *Plan
 	for _, p := range a.plans {
 		if strings.EqualFold(p.Key, planRequest) {
@@ -96,5 +98,5 @@ func (a *agent) processRequest(ctx context.Context, planRequest string) {
 	a.running = append(a.running, plan.Key)
 	a.runLock.Unlock()
 
-	a.execute(ctx, plan)
+	a.execute(ctx, plan, payload)
 }

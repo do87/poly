@@ -10,11 +10,11 @@ import (
 
 // Tree is the polytree handler
 type Tree struct {
-	Type    string
 	Key     string
 	Nodes   []*Node
 	Timeout time.Duration
 	Meta    interface{}
+	Payload []byte //request payload
 
 	// internal
 	seenNodes   map[string]bool
@@ -25,7 +25,6 @@ type Tree struct {
 
 // Node is a node in the polytree
 type Node struct {
-	Type     string
 	Key      string
 	Parents  []*Node
 	Children []*Node
@@ -33,7 +32,7 @@ type Node struct {
 	Error    error
 }
 
-type Exec func(ctx context.Context) (Exec, error)
+type Exec func(ctx context.Context, meta interface{}, payload []byte) (Exec, error)
 
 func New() *Tree {
 	return &Tree{
@@ -42,12 +41,9 @@ func New() *Tree {
 }
 
 // AddNode adds a node to the polytree
-func (t *Tree) AddNode(planType, planKey string, exec Exec) *Node {
-	return &Node{
-		Type: planType,
-		Key:  planKey,
-		Exec: Exec(exec),
-	}
+func (t *Tree) AddNode(node *Node) *Tree {
+	t.Nodes = append(t.Nodes, node)
+	return t
 }
 
 // AddDependency creates dependencies between nodes
@@ -74,7 +70,7 @@ func (t *Tree) execNode(ctx context.Context, node *Node, done chan *Node) {
 		}()
 
 		// run all steps
-		for step, err := node.Exec(ctxWrap); step != nil; {
+		for step, err := node.Exec(ctxWrap, t.Meta, t.Payload); step != nil; {
 			if err != nil {
 				ch <- err
 				break
@@ -87,7 +83,7 @@ func (t *Tree) execNode(ctx context.Context, node *Node, done chan *Node) {
 			}
 
 			// run next step
-			if step, err = step(ctxWrap); err != nil {
+			if step, err = step(ctxWrap, t.Meta, t.Payload); err != nil {
 				ch <- err
 			}
 		}

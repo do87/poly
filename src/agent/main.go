@@ -8,7 +8,7 @@ import (
 
 func main() {
 	ctx := context.Background()
-	agent.Register(agent.Tags{
+	agent.Register(agent.Labels{
 		"infra": "prod",
 	}).Run(ctx)
 }
