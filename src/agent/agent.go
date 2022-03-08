@@ -9,8 +9,8 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/do87/poly/src/agent/internal/logger"
-	"github.com/do87/poly/src/agent/internal/polytree"
+	"github.com/do87/poly/src/logger"
+	"github.com/do87/poly/src/polytree"
 )
 
 // agent is the agent service
