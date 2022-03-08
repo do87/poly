@@ -18,15 +18,20 @@ type Config struct {
 	BindPort int
 }
 
+type cleanup func() error
 type api struct {
-	router *chi.Mux
-	config Config
+	router  *chi.Mux
+	config  Config
+	cleanup []cleanup
 }
 
 func New(c Config) *api {
+	log, logsync := logger.New()
+
 	return &api{
-		router: newChiRouter(),
-		config: c,
+		router:  newChiRouter(log),
+		config:  c,
+		cleanup: []cleanup{logsync},
 	}
 }
 
@@ -38,12 +43,15 @@ func (a *api) Register(handlers ...Handler) *api {
 }
 
 func (a *api) Run() {
-	log, logsync := logger.New()
-	defer logsync()
-	a.router.Use(log.ChiMiddleware())
-
+	defer a.Cleanup()
 	if err := http.ListenAndServe(a.serverStr(), a.router); err != nil {
 		panic(err)
+	}
+}
+
+func (a *api) Cleanup() {
+	for _, c := range a.cleanup {
+		c()
 	}
 }
 
@@ -61,11 +69,11 @@ func (a *api) serverStr() string {
 	return fmt.Sprintf("%s:%d", addr, port)
 }
 
-func newChiRouter() *chi.Mux {
+func newChiRouter(log *logger.Logger) *chi.Mux {
 	r := chi.NewRouter()
 	r.Use(middleware.Timeout(5 * time.Second))
 	r.Use(middleware.RedirectSlashes)
-	// r.Use(log.ChiMiddleware())
+	r.Use(log.ChiMiddleware())
 	r.Use(render.SetContentType(render.ContentTypeJSON))
 	return r
 }
