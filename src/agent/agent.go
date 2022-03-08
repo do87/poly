@@ -29,9 +29,8 @@ type Plan = polytree.Tree
 type Labels map[string]string
 
 func (a *agent) execute(ctx context.Context, log *logger.Logger, plan *Plan, request *Request) {
-	t := (*polytree.Tree)(plan)
-	t = t.Copy()
-	t.ExecuteWithTimeout(ctx, request.ID, request.Payload, a.PlanTimeout)
+	t := (*polytree.Tree)(plan).Copy()
+	t.ExecuteWithTimeout(ctx, log, request.ID, request.Payload, a.PlanTimeout)
 	a.done(ctx, plan)
 }
 
@@ -116,11 +115,17 @@ func (a *agent) processRequest(ctx context.Context, log *logger.Logger, request 
 		return
 	}
 
-	log.Info("Marking request as 'running'", "request", request)
 	a.runLock.Lock()
+	defer a.runLock.Unlock()
+	for _, key := range a.running {
+		if key == plan.Key {
+			return
+		}
+	}
+
+	log.Info("Marking request as 'running'", "request", request)
 	a.running = append(a.running, plan.Key)
-	a.runLock.Unlock()
 
 	log.Info("Executing request", "request", request)
-	a.execute(ctx, log, plan, request)
+	go a.execute(ctx, log, plan, request)
 }

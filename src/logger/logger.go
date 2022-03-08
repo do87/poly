@@ -16,8 +16,8 @@ func New() (*Logger, func() error) {
 	}, log.Sync
 }
 
-func NewNodeLogger(plan, runID, node string) (*Logger, func() error) {
-	log, _ := zap.NewProduction(zap.Fields(
+func (l *Logger) NodeLogger(plan, runID, node string) *Logger {
+	log := l.comp.WithOptions(zap.Fields(
 		zap.Field{
 			Key:    "node",
 			Type:   zapcore.StringType,
@@ -32,7 +32,7 @@ func NewNodeLogger(plan, runID, node string) (*Logger, func() error) {
 
 	return &Logger{
 		comp: log.Named(runID),
-	}, log.Sync
+	}
 }
 
 func (l *Logger) Named(name string) *Logger {
