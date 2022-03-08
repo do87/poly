@@ -18,16 +18,28 @@ func Plan() *agent.Plan {
 		Timeout: 1 * time.Hour,
 	}
 
-	node := &polytree.Node{
+	storage := &polytree.Node{
 		Key:  "state-storage",
 		Exec: polytree.Exec(stateStorageNode),
 	}
 
-	p.AddNode(node)
+	tfrun := &polytree.Node{
+		Key:  "run-terraform",
+		Exec: polytree.Exec(tfRunNode),
+	}
+
+	p.AddNode(storage)
+	p.AddNode(tfrun)
+	p.AddDependency(storage, tfrun)
 	return p
 }
 
 func stateStorageNode(ctx context.Context, log *logger.Logger, meta interface{}, payload []byte) (polytree.Exec, error) {
 	log.Info("[Infra Plan] State Storage Node")
+	return nil, nil
+}
+
+func tfRunNode(ctx context.Context, log *logger.Logger, meta interface{}, payload []byte) (polytree.Exec, error) {
+	log.Info("[Infra Plan] Run Terraform Node")
 	return nil, nil
 }
