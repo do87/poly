@@ -56,6 +56,10 @@ func (t *Tree) AddDependency(parent, child *Node) *Tree {
 	return t
 }
 
+func (t *Tree) ParentOf(parent, child *Node) *Tree {
+	return t.AddDependency(parent, child)
+}
+
 func (t *Tree) execNode(ctx context.Context, node *Node, done chan *Node) {
 	ctxWrap, cancel := context.WithTimeout(ctx, t.Timeout)
 	if !t.shouldNodeRun(ctxWrap, cancel, node) {
