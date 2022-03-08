@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"sync"
 	"time"
+
+	"github.com/do87/poly/src/agent/internal/logger"
 )
 
 // Tree is the polytree handler
@@ -32,7 +34,7 @@ type Node struct {
 	Error    error
 }
 
-type Exec func(ctx context.Context, meta interface{}, payload []byte) (Exec, error)
+type Exec func(ctx context.Context, log *logger.Logger, meta interface{}, payload []byte) (Exec, error)
 
 func New() *Tree {
 	return &Tree{
@@ -53,7 +55,7 @@ func (t *Tree) AddDependency(parent, child *Node) *Tree {
 	return t
 }
 
-func (t *Tree) execNode(ctx context.Context, node *Node, done chan *Node) {
+func (t *Tree) execNode(ctx context.Context, log *logger.Logger, node *Node, done chan *Node) {
 	ctxWrap, cancel := context.WithTimeout(ctx, t.Timeout)
 	if !t.shouldNodeRun(ctxWrap, cancel, node) {
 		return
@@ -70,7 +72,7 @@ func (t *Tree) execNode(ctx context.Context, node *Node, done chan *Node) {
 		}()
 
 		// run all steps
-		for step, err := node.Exec(ctxWrap, t.Meta, t.Payload); step != nil; {
+		for step, err := node.Exec(ctxWrap, log, t.Meta, t.Payload); step != nil; {
 			if err != nil {
 				ch <- err
 				break
@@ -83,7 +85,7 @@ func (t *Tree) execNode(ctx context.Context, node *Node, done chan *Node) {
 			}
 
 			// run next step
-			if step, err = step(ctxWrap, t.Meta, t.Payload); err != nil {
+			if step, err = step(ctxWrap, log, t.Meta, t.Payload); err != nil {
 				ch <- err
 			}
 		}
@@ -139,22 +141,22 @@ func (t *Tree) shouldNodeRun(ctx context.Context, cancel context.CancelFunc, nod
 }
 
 // Execute is used to execute each polytree node.Exec function
-func (t *Tree) Execute(ctx context.Context) {
+func (t *Tree) Execute(ctx context.Context, log *logger.Logger) {
 	t.pendingRun = t.getTopNodes()
-	t.execute(ctx)
+	t.execute(ctx, log)
 	t.cleanup()
 }
 
 // ExecuteWithTimeout is used to execute each polytree node.Exec function, with a global run timeout
-func (t *Tree) ExecuteWithTimeout(ctx context.Context, timeout time.Duration) {
+func (t *Tree) ExecuteWithTimeout(ctx context.Context, log *logger.Logger, timeout time.Duration) {
 	ctxWrap, cancel := context.WithTimeout(ctx, timeout)
 	t.pendingRun = t.getTopNodes()
-	t.execute(ctxWrap)
+	t.execute(ctxWrap, log)
 	t.cleanup(cancel)
 }
 
 // execute runs all pending nodes
-func (t *Tree) execute(ctx context.Context) {
+func (t *Tree) execute(ctx context.Context, log *logger.Logger) {
 	if len(t.pendingRun) == 0 {
 		return
 	}
@@ -167,7 +169,7 @@ func (t *Tree) execute(ctx context.Context) {
 
 	done := make(chan *Node, len(nodes))
 	for _, node := range nodes {
-		go t.execNode(ctx, node, done)
+		go t.execNode(ctx, log, node, done)
 	}
 
 	for i := 0; i < len(nodes); i++ {
@@ -178,7 +180,7 @@ func (t *Tree) execute(ctx context.Context) {
 		t.pendingLock.Lock()
 		t.pendingRun = append(t.pendingRun, node.Children...)
 		t.pendingLock.Unlock()
-		t.execute(ctx)
+		t.execute(ctx, log)
 	}
 }
 

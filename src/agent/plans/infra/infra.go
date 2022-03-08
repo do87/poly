@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"github.com/do87/poly/src/agent/internal/logger"
 	"github.com/do87/poly/src/agent/internal/polytree"
 )
 
@@ -25,6 +26,7 @@ func Plan() *polytree.Tree {
 	return p
 }
 
-func stateStorageNode(ctx context.Context, meta interface{}, payload []byte) (polytree.Exec, error) {
+func stateStorageNode(ctx context.Context, log *logger.Logger, meta interface{}, payload []byte) (polytree.Exec, error) {
+	log.Info("[Infra Plan] State Storage Node")
 	return nil, nil
 }

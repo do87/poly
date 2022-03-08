@@ -9,6 +9,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/do87/poly/src/agent/internal/logger"
 	"github.com/do87/poly/src/agent/internal/polytree"
 )
 
@@ -26,10 +27,11 @@ type agent struct {
 type Plan polytree.Tree
 type Labels map[string]string
 
-func (a *agent) execute(ctx context.Context, plan *Plan, payload []byte) {
+func (a *agent) execute(ctx context.Context, log *logger.Logger, plan *Plan, payload []byte) {
 	t := (*polytree.Tree)(plan)
 	t.Payload = payload
-	t.ExecuteWithTimeout(ctx, a.PlanTimeout)
+	t.Timeout = a.PlanTimeout
+	t.ExecuteWithTimeout(ctx, log, a.PlanTimeout)
 	a.save(ctx, plan)
 }
 
@@ -55,29 +57,30 @@ func Register(labels Labels, plans ...*Plan) *agent {
 }
 
 // Run runs the agent
-func (a *agent) Run(ctx context.Context) {
+func (a *agent) Run(ctx context.Context, log *logger.Logger) {
 	ctx, stop := signal.NotifyContext(ctx, os.Interrupt, syscall.SIGTERM)
 	ticker := time.NewTicker(a.PollInterval)
 
-	select {
-	case <-ticker.C:
-		a.poll(ctx)
-		return
-	case <-ctx.Done():
-		a.eol(stop)
-		return
+	for {
+		select {
+		case <-ticker.C:
+			a.poll(ctx, log)
+		case <-ctx.Done():
+			a.eol(stop)
+			return
+		}
 	}
 }
 
 // poll checks api for new plan requests
-func (a *agent) poll(ctx context.Context) {
-	request := "plan1" // TODO
-	payload := []byte(`{"hello": "world"}`)
-	a.processRequest(ctx, request, payload)
+func (a *agent) poll(ctx context.Context, log *logger.Logger) {
+	request := "plan:infra:v1" // TODO
+	payload := []byte(`{"env": "dev"}`)
+	a.processRequest(ctx, log, request, payload)
 }
 
 // processRequest find plan keys that match the request
-func (a *agent) processRequest(ctx context.Context, planRequest string, payload []byte) {
+func (a *agent) processRequest(ctx context.Context, log *logger.Logger, planRequest string, payload []byte) {
 	var plan *Plan
 	for _, p := range a.plans {
 		if strings.EqualFold(p.Key, planRequest) {
@@ -98,5 +101,5 @@ func (a *agent) processRequest(ctx context.Context, planRequest string, payload 
 	a.running = append(a.running, plan.Key)
 	a.runLock.Unlock()
 
-	a.execute(ctx, plan, payload)
+	a.execute(ctx, log, plan, payload)
 }
