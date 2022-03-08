@@ -29,7 +29,7 @@ type Plan = polytree.Tree
 type Labels map[string]string
 
 func (a *agent) execute(ctx context.Context, log *logger.Logger, plan *Plan, request *Request) {
-	t := (*polytree.Tree)(plan).Copy()
+	t := (*polytree.Tree)(plan).Init()
 	t.ExecuteWithTimeout(ctx, log, request.ID, request.Payload, a.PlanTimeout)
 	a.done(ctx, plan)
 }

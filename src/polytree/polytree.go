@@ -37,7 +37,7 @@ type Node struct {
 
 type Exec func(ctx context.Context, log *logger.Logger, meta interface{}, payload []byte) (Exec, error)
 
-func (t *Tree) Copy() *Tree {
+func (t *Tree) Init() *Tree {
 	timeout := t.Timeout
 	if t.Timeout == 0 {
 		timeout = 1 * time.Hour
