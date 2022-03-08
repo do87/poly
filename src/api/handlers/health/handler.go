@@ -8,7 +8,7 @@ type Health struct {
 	route *chi.Mux
 }
 
-func Handle(r *chi.Mux) {
+func Handler(r *chi.Mux) {
 	p := &Health{
 		route: r,
 	}
