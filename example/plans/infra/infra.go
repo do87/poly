@@ -12,7 +12,11 @@ import (
 type infra struct{}
 
 func Plan() *agent.Plan {
-	p := agent.NewPlan("plan:infra:v1", &infra{}, 1*time.Hour)
+	p := &agent.Plan{
+		Key:     "plan:infra:v1",
+		Meta:    &infra{},
+		Timeout: 1 * time.Hour,
+	}
 
 	storage := &polytree.Node{
 		Key:  "state-storage",

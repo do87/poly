@@ -26,22 +26,16 @@ type agent struct {
 
 type Plan = polytree.Tree
 
-var NewPlan = polytree.New
-
 type Labels map[string]string
 
 func (a *agent) execute(ctx context.Context, log *logger.Logger, plan *Plan, request *Request) {
 	t := (*polytree.Tree)(plan)
-	newcopy := &t
-	t = *newcopy
-	t.Payload = request.Payload
-	t.Timeout = a.PlanTimeout
-	t.RunID = request.ID
-	t.ExecuteWithTimeout(ctx, a.PlanTimeout)
-	a.save(ctx, plan)
+	t = t.Copy()
+	t.ExecuteWithTimeout(ctx, request.ID, request.Payload, a.PlanTimeout)
+	a.done(ctx, plan)
 }
 
-func (a *agent) save(ctx context.Context, plan *Plan) *agent { // TODO
+func (a *agent) done(ctx context.Context, plan *Plan) *agent { // TODO: tell API when execution finished
 	return a
 }
 
@@ -122,9 +116,11 @@ func (a *agent) processRequest(ctx context.Context, log *logger.Logger, request 
 		return
 	}
 
+	log.Info("Marking request as 'running'", "request", request)
 	a.runLock.Lock()
 	a.running = append(a.running, plan.Key)
 	a.runLock.Unlock()
 
+	log.Info("Executing request", "request", request)
 	a.execute(ctx, log, plan, request)
 }

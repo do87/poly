@@ -13,17 +13,17 @@ import (
 // Tree is the polytree handler
 type Tree struct {
 	Key     string
-	RunID   string
 	Nodes   []*Node
 	Timeout time.Duration
 	Meta    interface{}
-	Payload []byte //request payload
 
 	// internal
-	seenNodes   map[string]bool
-	errors      map[string]error
-	pendingRun  []*Node
-	pendingLock *sync.Mutex
+	seenNodes      map[string]bool
+	errors         map[string]error
+	pendingRun     []*Node
+	pendingLock    *sync.Mutex
+	requestID      string
+	requestPayload []byte
 }
 
 // Node is a node in the polytree
@@ -37,10 +37,14 @@ type Node struct {
 
 type Exec func(ctx context.Context, log *logger.Logger, meta interface{}, payload []byte) (Exec, error)
 
-func New(key string, meta interface{}, timeout time.Duration) *Tree {
+func (t *Tree) Copy() *Tree {
+	timeout := t.Timeout
+	if t.Timeout == 0 {
+		timeout = 1 * time.Hour
+	}
 	return &Tree{
-		Key:         key,
-		Meta:        meta,
+		Key:         t.Key,
+		Meta:        t.Meta,
 		Timeout:     timeout,
 		pendingLock: &sync.Mutex{},
 		seenNodes:   map[string]bool{},
@@ -71,7 +75,7 @@ func (t *Tree) execNode(ctx context.Context, node *Node, done chan *Node) {
 		return
 	}
 
-	log, logd := logger.NewNodeLogger(t.Key, t.RunID, node.Key)
+	log, logd := logger.NewNodeLogger(t.Key, t.requestID, node.Key)
 	defer logd()
 
 	var err error
@@ -85,7 +89,8 @@ func (t *Tree) execNode(ctx context.Context, node *Node, done chan *Node) {
 		}()
 
 		// run all steps
-		for step, err := node.Exec(ctxWrap, log, t.Meta, t.Payload); step != nil; {
+		log.Info("runninig node...")
+		for step, err := node.Exec(ctxWrap, log, t.Meta, t.requestPayload); step != nil; {
 			if err != nil {
 				ch <- err
 				break
@@ -98,7 +103,7 @@ func (t *Tree) execNode(ctx context.Context, node *Node, done chan *Node) {
 			}
 
 			// run next step
-			if step, err = step(ctxWrap, log, t.Meta, t.Payload); err != nil {
+			if step, err = step(ctxWrap, log, t.Meta, t.requestPayload); err != nil {
 				ch <- err
 			}
 		}
@@ -110,6 +115,11 @@ func (t *Tree) execNode(ctx context.Context, node *Node, done chan *Node) {
 
 	select {
 	case err := <-ch:
+		if err != nil {
+			log.Info("node finished successfully")
+		} else {
+			log.Info("node errored", "error", err.Error())
+		}
 		node.Error = err
 	case <-ctxWrap.Done():
 		node.Error = errors.New("node execution timeout")
@@ -153,15 +163,10 @@ func (t *Tree) shouldNodeRun(ctx context.Context, cancel context.CancelFunc, nod
 	return true
 }
 
-// Execute is used to execute each polytree node.Exec function
-func (t *Tree) Execute(ctx context.Context, log *logger.Logger) {
-	t.pendingRun = t.getTopNodes()
-	t.execute(ctx)
-	t.cleanup()
-}
-
 // ExecuteWithTimeout is used to execute each polytree node.Exec function, with a global run timeout
-func (t *Tree) ExecuteWithTimeout(ctx context.Context, timeout time.Duration) {
+func (t *Tree) ExecuteWithTimeout(ctx context.Context, requestID string, payload []byte, timeout time.Duration) {
+	t.requestID = requestID
+	t.requestPayload = payload
 	ctxWrap, cancel := context.WithTimeout(ctx, timeout)
 	t.pendingRun = t.getTopNodes()
 	t.execute(ctxWrap)
