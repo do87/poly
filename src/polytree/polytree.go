@@ -39,7 +39,8 @@ type Exec func(ctx context.Context, log *logger.Logger, meta interface{}, payloa
 
 func New() *Tree {
 	return &Tree{
-		Timeout: 1 * time.Hour,
+		Timeout:     1 * time.Hour,
+		pendingLock: &sync.Mutex{},
 	}
 }
 
@@ -105,7 +106,6 @@ func (t *Tree) execNode(ctx context.Context, node *Node, done chan *Node) {
 
 	select {
 	case err := <-ch:
-		log.Error(err)
 		node.Error = err
 	case <-ctxWrap.Done():
 		node.Error = errors.New("node execution timeout")

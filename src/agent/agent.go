@@ -72,6 +72,8 @@ func (a *agent) Run(ctx context.Context) {
 	ctx, stop := signal.NotifyContext(ctx, os.Interrupt, syscall.SIGTERM)
 	ticker := time.NewTicker(a.PollInterval)
 
+	log.Info("agent is running...")
+
 	for {
 		select {
 		case <-ticker.C:

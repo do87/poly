@@ -32,22 +32,22 @@ func (l *Logger) Named(name string) *Logger {
 	}
 }
 
-func (l *Logger) Info(args ...interface{}) {
-	l.comp.Sugar().Info(args)
+func (l *Logger) Info(msg string, args ...interface{}) {
+	l.comp.WithOptions(zap.AddCallerSkip(1)).Sugar().Infow(msg, args...)
 }
 
-func (l *Logger) Warning(args ...interface{}) {
-	l.comp.Sugar().Warn(args)
+func (l *Logger) Warning(msg string, args ...interface{}) {
+	l.comp.WithOptions(zap.AddCallerSkip(1)).Sugar().Warnw(msg, args...)
 }
 
-func (l *Logger) Error(args ...interface{}) {
-	l.comp.Sugar().Error(args)
+func (l *Logger) Error(msg string, args ...interface{}) {
+	l.comp.WithOptions(zap.AddCallerSkip(1)).Sugar().Errorw(msg, args...)
 }
 
-func (l *Logger) Debug(args ...interface{}) {
-	l.comp.Sugar().Debug(args)
+func (l *Logger) Debug(msg string, args ...interface{}) {
+	l.comp.WithOptions(zap.AddCallerSkip(1)).Sugar().Debugw(msg, args...)
 }
 
-func (l *Logger) Fatal(args ...interface{}) {
-	l.comp.Sugar().Fatal(args)
+func (l *Logger) Fatal(msg string, args ...interface{}) {
+	l.comp.WithOptions(zap.AddCallerSkip(1)).Sugar().Fatalw(msg, args...)
 }
