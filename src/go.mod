@@ -1,4 +1,4 @@
-module github.com/do87/poly/src/agent
+module github.com/do87/poly/src
 
 go 1.17
 
