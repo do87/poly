@@ -1,8 +1,11 @@
 package logger
 
 import (
+	"net/http"
+
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
+	"moul.io/chizap"
 )
 
 type Logger struct {
@@ -14,6 +17,13 @@ func New() (*Logger, func() error) {
 	return &Logger{
 		comp: log,
 	}, log.Sync
+}
+
+func (l *Logger) ChiMiddleware() func(http.Handler) http.Handler {
+	return chizap.New(l.comp, &chizap.Opts{
+		WithReferer:   true,
+		WithUserAgent: true,
+	})
 }
 
 func (l *Logger) NodeLogger(plan, runID, node string) *Logger {
