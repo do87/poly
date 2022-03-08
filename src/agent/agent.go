@@ -31,11 +31,28 @@ type Labels map[string]string
 func (a *agent) execute(ctx context.Context, log *logger.Logger, plan *Plan, request *Request) {
 	t := (*polytree.Tree)(plan).Init()
 	t.ExecuteWithTimeout(ctx, log, request.ID, request.Payload, a.PlanTimeout)
-	a.done(ctx, plan)
+	a.done(ctx, log, plan)
 }
 
-func (a *agent) done(ctx context.Context, plan *Plan) *agent { // TODO: tell API when execution finished
+func (a *agent) done(ctx context.Context, log *logger.Logger, plan *Plan) *agent { // TODO: tell API when execution finished
+	log.Info("removing plan from agent running plans list", "plan", plan.Key)
+	a.removeFromRunning(plan)
 	return a
+}
+
+// removeFromRunning removes given plan from runnng lst
+func (a *agent) removeFromRunning(plan *Plan) {
+	newRunnng := []string{}
+	for _, run := range a.running {
+		if run == plan.Key {
+			continue
+		}
+		newRunnng = append(newRunnng, run)
+	}
+
+	a.runLock.Lock()
+	defer a.runLock.Unlock()
+	a.running = newRunnng
 }
 
 // New returens a new agent

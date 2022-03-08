@@ -80,7 +80,7 @@ func (t *Tree) execNode(ctx context.Context, log *logger.Logger, node *Node, don
 	if !t.shouldNodeRun(ctxWrap, cancel, node) {
 		return
 	}
-	log.Info("entered node exec")
+
 	log = log.NodeLogger(t.Key, t.requestID, node.Key)
 	var err error
 	ch := make(chan error)
@@ -93,7 +93,6 @@ func (t *Tree) execNode(ctx context.Context, log *logger.Logger, node *Node, don
 		}()
 
 		// run all steps
-		log.Info("runninig node...")
 		for step, err := node.Exec(ctxWrap, log, t.Meta, t.requestPayload); step != nil; {
 			if err != nil {
 				ch <- err
@@ -119,7 +118,7 @@ func (t *Tree) execNode(ctx context.Context, log *logger.Logger, node *Node, don
 
 	select {
 	case err := <-ch:
-		if err != nil {
+		if err == nil {
 			log.Info("node finished successfully")
 		} else {
 			log.Info("node errored", "error", err.Error())
@@ -130,6 +129,7 @@ func (t *Tree) execNode(ctx context.Context, log *logger.Logger, node *Node, don
 	}
 
 	t.setSeen(node)
+	done <- node
 }
 
 // shouldNodeRun returns true if the node should run
@@ -172,9 +172,10 @@ func (t *Tree) ExecuteWithTimeout(ctx context.Context, log *logger.Logger, reque
 	t.requestID = requestID
 	t.requestPayload = payload
 	ctxWrap, cancel := context.WithTimeout(ctx, timeout)
+	defer cancel()
+
 	t.pendingRun = t.getTopNodes()
 	t.execute(ctxWrap, log)
-	t.cleanup(cancel)
 }
 
 // execute runs all pending nodes
@@ -244,13 +245,4 @@ func (t *Tree) getTopNodes() []*Node {
 		}
 	}
 	return n
-}
-
-func (t *Tree) cleanup(cancel ...context.CancelFunc) {
-	t.seenNodes = map[string]bool{}
-	t.errors = map[string]error{}
-	t.pendingRun = []*Node{}
-	for _, c := range cancel {
-		c()
-	}
 }
