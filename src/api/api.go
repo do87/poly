@@ -21,6 +21,7 @@ type Config struct {
 type cleanup func() error
 type api struct {
 	router  *chi.Mux
+	log     *logger.Logger
 	config  Config
 	cleanup []cleanup
 }
@@ -29,7 +30,8 @@ func New(c Config) *api {
 	log, logsync := logger.New()
 
 	return &api{
-		router:  newChiRouter(log),
+		log:     log,
+		router:  newRouter(log),
 		config:  c,
 		cleanup: []cleanup{logsync},
 	}
@@ -44,6 +46,7 @@ func (a *api) Register(handlers ...Handler) *api {
 
 func (a *api) Run() {
 	defer a.Cleanup()
+	a.log.Info("running server...", "host", a.serverStr())
 	if err := http.ListenAndServe(a.serverStr(), a.router); err != nil {
 		panic(err)
 	}
@@ -69,7 +72,7 @@ func (a *api) serverStr() string {
 	return fmt.Sprintf("%s:%d", addr, port)
 }
 
-func newChiRouter(log *logger.Logger) *chi.Mux {
+func newRouter(log *logger.Logger) *chi.Mux {
 	r := chi.NewRouter()
 	r.Use(middleware.Timeout(5 * time.Second))
 	r.Use(middleware.RedirectSlashes)
