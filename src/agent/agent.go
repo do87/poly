@@ -25,6 +25,8 @@ type agent struct {
 }
 
 type Plan = polytree.Tree
+type Job = polytree.Node
+type Exec = polytree.Exec
 
 type Labels map[string]string
 
