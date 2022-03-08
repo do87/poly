@@ -26,6 +26,8 @@ type agent struct {
 
 type Plan = polytree.Tree
 
+var NewPlan = polytree.New
+
 type Labels map[string]string
 
 func (a *agent) execute(ctx context.Context, log *logger.Logger, plan *Plan, request *Request) {

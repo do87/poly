@@ -1,6 +1,9 @@
 package logger
 
-import "go.uber.org/zap"
+import (
+	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
+)
 
 type Logger struct {
 	comp *zap.Logger
@@ -13,16 +16,22 @@ func New() (*Logger, func() error) {
 	}, log.Sync
 }
 
-func NewNodeLogger(name, run string) (*Logger, func() error) {
+func NewNodeLogger(plan, runID, node string) (*Logger, func() error) {
 	log, _ := zap.NewProduction(zap.Fields(
 		zap.Field{
-			Key:    "run",
-			String: run,
+			Key:    "node",
+			Type:   zapcore.StringType,
+			String: node,
+		},
+		zap.Field{
+			Key:    "plan",
+			Type:   zapcore.StringType,
+			String: plan,
 		},
 	))
 
 	return &Logger{
-		comp: log.Named(name),
+		comp: log.Named(runID),
 	}, log.Sync
 }
 

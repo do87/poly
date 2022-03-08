@@ -12,11 +12,7 @@ import (
 type infra struct{}
 
 func Plan() *agent.Plan {
-	p := &agent.Plan{
-		Key:     "plan:infra:v1",
-		Meta:    &infra{},
-		Timeout: 1 * time.Hour,
-	}
+	p := agent.NewPlan("plan:infra:v1", &infra{}, 1*time.Hour)
 
 	storage := &polytree.Node{
 		Key:  "state-storage",
@@ -35,11 +31,11 @@ func Plan() *agent.Plan {
 }
 
 func stateStorageNode(ctx context.Context, log *logger.Logger, meta interface{}, payload []byte) (polytree.Exec, error) {
-	log.Info("[Infra Plan] State Storage Node")
+	log.Info("Handling Terraform State Storage")
 	return nil, nil
 }
 
 func tfRunNode(ctx context.Context, log *logger.Logger, meta interface{}, payload []byte) (polytree.Exec, error) {
-	log.Info("[Infra Plan] Run Terraform Node")
+	log.Info("Handling Terraform Run")
 	return nil, nil
 }

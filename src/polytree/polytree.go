@@ -37,10 +37,14 @@ type Node struct {
 
 type Exec func(ctx context.Context, log *logger.Logger, meta interface{}, payload []byte) (Exec, error)
 
-func New() *Tree {
+func New(key string, meta interface{}, timeout time.Duration) *Tree {
 	return &Tree{
-		Timeout:     1 * time.Hour,
+		Key:         key,
+		Meta:        meta,
+		Timeout:     timeout,
 		pendingLock: &sync.Mutex{},
+		seenNodes:   map[string]bool{},
+		errors:      map[string]error{},
 	}
 }
 
@@ -67,7 +71,7 @@ func (t *Tree) execNode(ctx context.Context, node *Node, done chan *Node) {
 		return
 	}
 
-	log, logd := logger.NewNodeLogger(node.Key, t.RunID)
+	log, logd := logger.NewNodeLogger(t.Key, t.RunID, node.Key)
 	defer logd()
 
 	var err error
