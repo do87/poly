@@ -27,11 +27,14 @@ type agent struct {
 type Plan polytree.Tree
 type Labels map[string]string
 
-func (a *agent) execute(ctx context.Context, log *logger.Logger, plan *Plan, payload []byte) {
+func (a *agent) execute(ctx context.Context, log *logger.Logger, plan *Plan, request *Request) {
 	t := (*polytree.Tree)(plan)
-	t.Payload = payload
+	newcopy := &t
+	t = *newcopy
+	t.Payload = request.Payload
 	t.Timeout = a.PlanTimeout
-	t.ExecuteWithTimeout(ctx, log, a.PlanTimeout)
+	t.RunID = request.ID
+	t.ExecuteWithTimeout(ctx, a.PlanTimeout)
 	a.save(ctx, plan)
 }
 
@@ -57,7 +60,10 @@ func Register(labels Labels, plans ...*Plan) *agent {
 }
 
 // Run runs the agent
-func (a *agent) Run(ctx context.Context, log *logger.Logger) {
+func (a *agent) Run(ctx context.Context) {
+	log, logsync := logger.New()
+	defer logsync()
+
 	ctx, stop := signal.NotifyContext(ctx, os.Interrupt, syscall.SIGTERM)
 	ticker := time.NewTicker(a.PollInterval)
 
@@ -72,18 +78,28 @@ func (a *agent) Run(ctx context.Context, log *logger.Logger) {
 	}
 }
 
+type Request struct {
+	ID      string
+	Plan    string
+	Payload []byte
+}
+
 // poll checks api for new plan requests
 func (a *agent) poll(ctx context.Context, log *logger.Logger) {
-	request := "plan:infra:v1" // TODO
-	payload := []byte(`{"env": "dev"}`)
-	a.processRequest(ctx, log, request, payload)
+	request := &Request{
+		ID:      "1",
+		Plan:    "plan:infra:v1",
+		Payload: []byte(`{"env": "dev"}`),
+	}
+
+	a.processRequest(ctx, log, request)
 }
 
 // processRequest find plan keys that match the request
-func (a *agent) processRequest(ctx context.Context, log *logger.Logger, planRequest string, payload []byte) {
+func (a *agent) processRequest(ctx context.Context, log *logger.Logger, request *Request) {
 	var plan *Plan
 	for _, p := range a.plans {
-		if strings.EqualFold(p.Key, planRequest) {
+		if strings.EqualFold(p.Key, request.Plan) {
 			plan = p
 			break
 		}
@@ -101,5 +117,5 @@ func (a *agent) processRequest(ctx context.Context, log *logger.Logger, planRequ
 	a.running = append(a.running, plan.Key)
 	a.runLock.Unlock()
 
-	a.execute(ctx, log, plan, payload)
+	a.execute(ctx, log, plan, request)
 }

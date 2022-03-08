@@ -13,6 +13,7 @@ import (
 // Tree is the polytree handler
 type Tree struct {
 	Key     string
+	RunID   string
 	Nodes   []*Node
 	Timeout time.Duration
 	Meta    interface{}
@@ -55,11 +56,14 @@ func (t *Tree) AddDependency(parent, child *Node) *Tree {
 	return t
 }
 
-func (t *Tree) execNode(ctx context.Context, log *logger.Logger, node *Node, done chan *Node) {
+func (t *Tree) execNode(ctx context.Context, node *Node, done chan *Node) {
 	ctxWrap, cancel := context.WithTimeout(ctx, t.Timeout)
 	if !t.shouldNodeRun(ctxWrap, cancel, node) {
 		return
 	}
+
+	log, logd := logger.NewNodeLogger(node.Key, t.RunID)
+	defer logd()
 
 	var err error
 	ch := make(chan error)
@@ -97,6 +101,7 @@ func (t *Tree) execNode(ctx context.Context, log *logger.Logger, node *Node, don
 
 	select {
 	case err := <-ch:
+		log.Error(err)
 		node.Error = err
 	case <-ctxWrap.Done():
 		node.Error = errors.New("node execution timeout")
@@ -143,20 +148,20 @@ func (t *Tree) shouldNodeRun(ctx context.Context, cancel context.CancelFunc, nod
 // Execute is used to execute each polytree node.Exec function
 func (t *Tree) Execute(ctx context.Context, log *logger.Logger) {
 	t.pendingRun = t.getTopNodes()
-	t.execute(ctx, log)
+	t.execute(ctx)
 	t.cleanup()
 }
 
 // ExecuteWithTimeout is used to execute each polytree node.Exec function, with a global run timeout
-func (t *Tree) ExecuteWithTimeout(ctx context.Context, log *logger.Logger, timeout time.Duration) {
+func (t *Tree) ExecuteWithTimeout(ctx context.Context, timeout time.Duration) {
 	ctxWrap, cancel := context.WithTimeout(ctx, timeout)
 	t.pendingRun = t.getTopNodes()
-	t.execute(ctxWrap, log)
+	t.execute(ctxWrap)
 	t.cleanup(cancel)
 }
 
 // execute runs all pending nodes
-func (t *Tree) execute(ctx context.Context, log *logger.Logger) {
+func (t *Tree) execute(ctx context.Context) {
 	if len(t.pendingRun) == 0 {
 		return
 	}
@@ -169,7 +174,7 @@ func (t *Tree) execute(ctx context.Context, log *logger.Logger) {
 
 	done := make(chan *Node, len(nodes))
 	for _, node := range nodes {
-		go t.execNode(ctx, log, node, done)
+		go t.execNode(ctx, node, done)
 	}
 
 	for i := 0; i < len(nodes); i++ {
@@ -180,7 +185,7 @@ func (t *Tree) execute(ctx context.Context, log *logger.Logger) {
 		t.pendingLock.Lock()
 		t.pendingRun = append(t.pendingRun, node.Children...)
 		t.pendingLock.Unlock()
-		t.execute(ctx, log)
+		t.execute(ctx)
 	}
 }
 

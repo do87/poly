@@ -13,6 +13,25 @@ func New() (*Logger, func() error) {
 	}, log.Sync
 }
 
+func NewNodeLogger(name, run string) (*Logger, func() error) {
+	log, _ := zap.NewProduction(zap.Fields(
+		zap.Field{
+			Key:    "run",
+			String: run,
+		},
+	))
+
+	return &Logger{
+		comp: log.Named(name),
+	}, log.Sync
+}
+
+func (l *Logger) Named(name string) *Logger {
+	return &Logger{
+		comp: l.comp.Named(name),
+	}
+}
+
 func (l *Logger) Info(args ...interface{}) {
 	l.comp.Sugar().Info(args)
 }
