@@ -4,9 +4,9 @@ import (
 	"context"
 	"time"
 
-	"github.com/do87/poly/src/agent/internal/agent"
-	"github.com/do87/poly/src/agent/internal/logger"
-	"github.com/do87/poly/src/agent/internal/polytree"
+	"github.com/do87/poly/src/agent"
+	"github.com/do87/poly/src/logger"
+	"github.com/do87/poly/src/polytree"
 )
 
 type infra struct{}

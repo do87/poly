@@ -3,8 +3,8 @@ package main
 import (
 	"context"
 
-	"github.com/do87/poly/src/agent/internal/agent"
-	"github.com/do87/poly/src/agent/plans/infra"
+	"github.com/do87/poly/example/plans/infra"
+	"github.com/do87/poly/src/agent"
 )
 
 func main() {
