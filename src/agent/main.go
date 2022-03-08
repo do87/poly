@@ -4,12 +4,15 @@ import (
 	"context"
 
 	"github.com/do87/poly/src/agent/internal/agent"
+	"github.com/do87/poly/src/agent/plans/infra"
 )
 
 func main() {
 	ctx := context.Background()
 
-	agent.Register(agent.Labels{
+	agent.New(agent.Labels{
 		"infra": "prod",
-	}).Run(ctx)
+	}).Register(
+		infra.Plan(),
+	).Run(ctx)
 }

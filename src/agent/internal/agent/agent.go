@@ -24,7 +24,8 @@ type agent struct {
 	runLock      sync.Mutex
 }
 
-type Plan polytree.Tree
+type Plan = polytree.Tree
+
 type Labels map[string]string
 
 func (a *agent) execute(ctx context.Context, log *logger.Logger, plan *Plan, request *Request) {
@@ -42,8 +43,8 @@ func (a *agent) save(ctx context.Context, plan *Plan) *agent { // TODO
 	return a
 }
 
-// Register creates a new worker and sets its tags and plans
-func Register(labels Labels, plans ...*Plan) *agent {
+// New returens a new agent
+func New(labels Labels) *agent {
 	a := &agent{
 		MaxParallel:  3,
 		PlanTimeout:  2 * time.Hour,
@@ -51,7 +52,11 @@ func Register(labels Labels, plans ...*Plan) *agent {
 		plans:        map[string]*Plan{},
 		labels:       labels,
 	}
+	return a
+}
 
+// Register register plans to agent
+func (a *agent) Register(plans ...*Plan) *agent {
 	// add plans by their keys
 	for _, plan := range plans {
 		a.plans[plan.Key] = plan
