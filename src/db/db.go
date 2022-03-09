@@ -3,6 +3,7 @@ package db
 import (
 	"fmt"
 
+	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
@@ -21,6 +22,11 @@ func New(dialector gorm.Dialector) (*DB, error) {
 	return &DB{
 		db: db,
 	}, nil
+}
+
+// NewPostgres returns a new postgres database service from connection string
+func NewPostgres(conn string) (*DB, error) {
+	return New(postgres.Open(conn))
 }
 
 // GetDB returns a pointer to the DB
