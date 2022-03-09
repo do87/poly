@@ -6,7 +6,9 @@ import (
 )
 
 func main() {
-	api.New(api.Config{}).Register(
+	api.New(api.Config{
+		DBConn: "",
+	}).Register(
 		health.Handler,
 	).Run()
 }

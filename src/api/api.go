@@ -5,22 +5,25 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/do87/poly/src/db"
 	"github.com/do87/poly/src/logger"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/render"
 )
 
-type Handler func(*chi.Mux)
+type Handler func(*chi.Mux, *db.DB)
 
 type Config struct {
 	BindAddr string
 	BindPort int
+	DBConn   string
 }
 
 type cleanup func() error
 type api struct {
 	router  *chi.Mux
+	db      *db.DB
 	log     *logger.Logger
 	config  Config
 	cleanup []cleanup
@@ -28,18 +31,31 @@ type api struct {
 
 func New(c Config) *api {
 	log, logsync := logger.New()
-
-	return &api{
+	api := &api{
 		log:     log,
 		router:  newRouter(log),
 		config:  c,
 		cleanup: []cleanup{logsync},
 	}
+	api.setupDatabase()
+	return api
+}
+
+func (a *api) setupDatabase() {
+	if a.config.DBConn == "" {
+		return
+	}
+	db, err := db.NewPostgres(a.config.DBConn)
+	if err != nil {
+		panic(err)
+	}
+	a.db = db
+	a.cleanup = append(a.cleanup, db.Close)
 }
 
 func (a *api) Register(handlers ...Handler) *api {
 	for _, handler := range handlers {
-		handler(a.router)
+		handler(a.router, a.db)
 	}
 	return a
 }
