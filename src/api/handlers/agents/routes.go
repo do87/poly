@@ -3,6 +3,7 @@ package agents
 import (
 	"net/http"
 
+	"github.com/do87/poly/src/api/handlers/agents/present"
 	"github.com/do87/poly/src/api/handlers/agents/usecases"
 	"github.com/go-chi/render"
 )
@@ -23,8 +24,9 @@ func listAgents(u *usecases.Usecase) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		data, err := u.Agents.List(r.Context(), r)
 		if err != nil {
-			render.JSON(w, r, err)
+			render.JSON(w, r, present.Error(w, r, http.StatusInternalServerError, err))
+			return
 		}
-		render.JSON(w, r, data)
+		render.JSON(w, r, present.Agents(data))
 	}
 }
