@@ -7,6 +7,7 @@ replace github.com/do87/poly/src => ../../src
 require github.com/do87/poly/src v0.0.0-00010101000000-000000000000
 
 require (
+	github.com/amalfra/etag v1.0.0 // indirect
 	github.com/go-chi/chi v1.5.4 // indirect
 	github.com/go-chi/chi/v5 v5.0.7 // indirect
 	github.com/go-chi/render v1.0.1 // indirect
@@ -20,6 +21,7 @@ require (
 	github.com/jackc/pgx/v4 v4.14.1 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.4 // indirect
+	github.com/lib/pq v1.10.2 // indirect
 	go.uber.org/atomic v1.8.0 // indirect
 	go.uber.org/multierr v1.7.0 // indirect
 	go.uber.org/zap v1.21.0 // indirect
