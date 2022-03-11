@@ -8,7 +8,7 @@ import (
 
 // Usecase service
 type Usecase struct {
-	agents AgentsRepository
+	Agents *agentsUsecase
 }
 
 // AgentsRepository is the allowed usecase repo for agents
@@ -19,6 +19,8 @@ type AgentsRepository interface {
 // New creates a new Usecase service
 func New(agents AgentsRepository) *Usecase {
 	return &Usecase{
-		agents: agents,
+		Agents: &agentsUsecase{
+			repo: agents,
+		},
 	}
 }
