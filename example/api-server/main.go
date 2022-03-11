@@ -7,7 +7,8 @@ import (
 
 func main() {
 	api.New(api.Config{
-		DBConn: "",
+		BindAddr: "127.0.0.1",
+		DBConn:   "postgres://postgres:postgres@127.0.0.1:5432/poly?sslmode=disable",
 	}).Register(
 		health.Handler,
 	).Run()
