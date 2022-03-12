@@ -9,6 +9,7 @@ import (
 )
 
 const (
+	KEY_AGENT  = "poly:agent"
 	KEY_AGENTS = "poly:agents"
 )
 
@@ -21,19 +22,30 @@ type agent struct {
 	UpdatedAt time.Time `json:"updated_at"`
 }
 
-func Agents(agents []models.Agent) Presentor {
+func (agent) FromModel(m models.Agent) agent {
+	return agent{
+		UUID:      m.UUID,
+		Hostname:  m.Hostname,
+		Labels:    m.Labels,
+		Plans:     m.Plans,
+		CreatedAt: m.CreatedAt,
+		UpdatedAt: m.UpdatedAt,
+	}
+}
+
+func Agents(agentModels []models.Agent) Presentor {
 	p := make([]agent, 0)
+	a := agent{}
 	u := ""
-	for _, a := range agents {
-		u += fmt.Sprintf("%s-%s-%s;", a.UUID, a.Hostname, a.UpdatedAt.String())
-		p = append(p, agent{
-			UUID:      a.UUID,
-			Hostname:  a.Hostname,
-			Labels:    a.Labels,
-			Plans:     a.Plans,
-			CreatedAt: a.CreatedAt,
-			UpdatedAt: a.UpdatedAt,
-		})
+	for _, m := range agentModels {
+		u += fmt.Sprintf("%s-%s-%s;", m.UUID, m.Hostname, m.UpdatedAt.String())
+		p = append(p, a.FromModel(m))
 	}
 	return wrap(KEY_AGENTS, etag.Generate(u, true), p)
+}
+
+func Agent(m models.Agent) Presentor {
+	a := agent{}
+	u := fmt.Sprintf("%s-%s-%s;", m.UUID, m.Hostname, m.UpdatedAt.String())
+	return wrap(KEY_AGENTS, etag.Generate(u, true), a.FromModel(m))
 }

@@ -27,3 +27,11 @@ func (r *agentsRepo) Register(ctx context.Context, agent models.Agent) (models.A
 	}
 	return agent, nil
 }
+
+// Deregister unregisters the agent
+func (r *agentsRepo) Deregister(ctx context.Context, agent models.Agent) error {
+	if result := r.db.Delete(&agent); result.Error != nil {
+		return result.Error
+	}
+	return nil
+}
