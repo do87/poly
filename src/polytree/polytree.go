@@ -35,8 +35,10 @@ type Node struct {
 	Error    error
 }
 
+// Exec is a step of node execution
 type Exec func(ctx context.Context, log *logger.Logger, meta interface{}, payload []byte) (Exec, error)
 
+// Init returns a new polytree
 func (t *Tree) Init() *Tree {
 	timeout := t.Timeout
 	if t.Timeout == 0 {
@@ -71,6 +73,7 @@ func (t *Tree) AddDependency(parent, child *Node) *Tree {
 	return t
 }
 
+// ParentOf sets parent-child relationship between nodes
 func (t *Tree) ParentOf(parent, child *Node) *Tree {
 	return t.AddDependency(parent, child)
 }
