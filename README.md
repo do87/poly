@@ -5,5 +5,5 @@
 
 Poly is a project focused on implementing and managing agents that can run plans in various environments
 
-The project consists of 2 main type of elements: an API which is the source of truth, and an agent element that can be extended an implemented according to the developer's needs.
+The project consists of an API which is the single source of truth, and an agents that can be extended and implemented according to the developer's needs.
 
