@@ -2,15 +2,17 @@ package usecases
 
 import (
 	"context"
+	"encoding/json"
 	"net/http"
 
 	"github.com/do87/poly/src/api/handlers/agents/models"
+	"github.com/do87/poly/src/api/handlers/agents/payloads"
 )
 
 // AgentsRepository is the allowed usecase repo for agents
 type AgentsRepository interface {
 	List(ctx context.Context) ([]models.Agent, error)
-	Register(ctx context.Context) (models.Agent, error)
+	Register(ctx context.Context, agent models.Agent) (models.Agent, error)
 }
 
 // NewAgentsUsecase creates a new Usecase service
@@ -32,6 +34,10 @@ func (u *agentsUsecase) List(ctx context.Context, r *http.Request) ([]models.Age
 }
 
 // Register registers an agent and returns it
-func (u *agentsUsecase) Register(ctx context.Context, r *http.Request) (models.Agent, error) {
-	return u.repo.Register(ctx)
+func (u *agentsUsecase) Register(ctx context.Context, r *http.Request) (agent models.Agent, err error) {
+	var payload payloads.Agent
+	if err = json.NewDecoder(r.Body).Decode(&payload); err != nil {
+		return
+	}
+	return u.repo.Register(ctx, payload.ToModel())
 }

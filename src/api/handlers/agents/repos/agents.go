@@ -21,6 +21,9 @@ func (r *agentsRepo) List(ctx context.Context) (agents []models.Agent, err error
 }
 
 // Register registers the agent
-func (r *agentsRepo) Register(ctx context.Context) (agent models.Agent, err error) {
+func (r *agentsRepo) Register(ctx context.Context, agent models.Agent) (models.Agent, error) {
+	if result := r.db.FirstOrCreate(&agent); result.Error != nil {
+		return agent, result.Error
+	}
 	return agent, nil
 }
