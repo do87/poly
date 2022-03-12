@@ -19,3 +19,8 @@ func (r *agentsRepo) List(ctx context.Context) (agents []models.Agent, err error
 	}
 	return agents, nil
 }
+
+// Register registers the agent
+func (r *agentsRepo) Register(ctx context.Context) (agent models.Agent, err error) {
+	return agent, nil
+}
