@@ -1,32 +1,14 @@
 package agents
 
-import (
-	"net/http"
-
-	"github.com/do87/poly/src/api/handlers/agents/present"
-	"github.com/do87/poly/src/api/handlers/agents/usecases"
-	"github.com/go-chi/render"
-)
-
 // setRoutes attaches product routes
-func (a *Agents) setRoutes() *Agents {
-	a.route.Get("/agents", listAgents(a.uc)) // list all agents
-	a.route.Post("/agent/{id}/poll", nil)    // agent API polling
-	a.route.Delete("/agent/{id}", nil)       // Delete an agent by ID
+func (a *handler) setRoutes() *handler {
+	a.route.Get("/agents", a.agents.list(a.uc))     // list all agents
+	a.route.Post("/agent", a.agents.register(a.uc)) // agent registration
+	a.route.Post("/agent/{id}/poll", nil)           // agent API polling
+	a.route.Delete("/agent/{id}", nil)              // Delete an agent by ID
 
 	a.route.Get("/agents/keys", nil)        // list agent keys
 	a.route.Post("/agents/key", nil)        // create a new agent key
 	a.route.Delete("/agents/key/{id}", nil) // Delete an agent key by ID
 	return a
-}
-
-func listAgents(u *usecases.Usecase) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		data, err := u.Agents.List(r.Context(), r)
-		if err != nil {
-			render.JSON(w, r, present.Error(w, r, http.StatusInternalServerError, err))
-			return
-		}
-		render.JSON(w, r, present.Agents(data))
-	}
 }

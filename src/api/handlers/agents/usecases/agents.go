@@ -7,6 +7,20 @@ import (
 	"github.com/do87/poly/src/api/handlers/agents/models"
 )
 
+// AgentsRepository is the allowed usecase repo for agents
+type AgentsRepository interface {
+	List(ctx context.Context) ([]models.Agent, error)
+}
+
+// NewAgentsUsecase creates a new Usecase service
+func NewAgentsUsecase(agents AgentsRepository) *Usecase {
+	return &Usecase{
+		Agents: &agentsUsecase{
+			repo: agents,
+		},
+	}
+}
+
 type agentsUsecase struct {
 	repo AgentsRepository
 }

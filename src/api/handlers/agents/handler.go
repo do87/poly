@@ -7,18 +7,22 @@ import (
 	"github.com/go-chi/chi/v5"
 )
 
-type Agents struct {
-	route *chi.Mux
-	repo  *repos.Repo
-	uc    *usecases.Usecase
+type handler struct {
+	route  *chi.Mux
+	repo   *repos.Repo
+	uc     *usecases.Usecase
+	agents *agents
 }
 
 func Handler(r *chi.Mux, d *db.DB) {
 	repo := repos.New(d)
-	p := &Agents{
+	p := &handler{
 		route: r,
 		repo:  repo,
-		uc:    usecases.New(repo.Agents),
+
+		agents: &agents{
+			uc: usecases.NewAgentsUsecase(repo.Agents),
+		},
 	}
 	p.setRoutes()
 }
