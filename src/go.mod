@@ -4,6 +4,7 @@ go 1.17
 
 require (
 	github.com/amalfra/etag v1.0.0
+	github.com/go-chi/chi v1.5.4
 	github.com/go-chi/chi/v5 v5.0.7
 	github.com/go-chi/render v1.0.1
 	github.com/lib/pq v1.10.2
@@ -14,7 +15,6 @@ require (
 )
 
 require (
-	github.com/go-chi/chi v1.5.4 // indirect
 	github.com/jackc/chunkreader/v2 v2.0.1 // indirect
 	github.com/jackc/pgconn v1.10.1 // indirect
 	github.com/jackc/pgio v1.0.0 // indirect
