@@ -4,6 +4,7 @@ import (
 	"net/http"
 )
 
+// Presentor is the response struct
 type Presentor struct {
 	Kind string      `json:"kind"`
 	Etag string      `json:"etag,omitempty"`

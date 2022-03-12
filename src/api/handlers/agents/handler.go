@@ -14,6 +14,7 @@ type handler struct {
 	keys   *keys
 }
 
+// Handler handles agent related routes and functionality
 func Handler(r *chi.Mux, d *db.DB) {
 	repo := repos.New(d)
 	p := &handler{

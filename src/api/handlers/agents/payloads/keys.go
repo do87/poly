@@ -6,6 +6,7 @@ import (
 	"github.com/do87/poly/src/api/handlers/agents/models"
 )
 
+// KeyCreate is the payload for creating agent key
 type KeyCreate struct {
 	UUID      string    `json:"id"`
 	Name      string    `json:"name"`

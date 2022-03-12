@@ -9,6 +9,7 @@ type health struct {
 	route *chi.Mux
 }
 
+// Handler handles health endpoint(s)
 func Handler(r *chi.Mux, database *db.DB) {
 	p := &health{
 		route: r,
