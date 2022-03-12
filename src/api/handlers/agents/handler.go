@@ -10,7 +10,6 @@ import (
 type handler struct {
 	route  *chi.Mux
 	repo   *repos.Repo
-	uc     *usecases.Usecase
 	agents *agents
 	keys   *keys
 }
