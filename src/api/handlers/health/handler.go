@@ -5,12 +5,12 @@ import (
 	"github.com/go-chi/chi/v5"
 )
 
-type Health struct {
+type health struct {
 	route *chi.Mux
 }
 
 func Handler(r *chi.Mux, database *db.DB) {
-	p := &Health{
+	p := &health{
 		route: r,
 	}
 

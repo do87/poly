@@ -6,6 +6,7 @@ import (
 	"github.com/lib/pq"
 )
 
+// Agent model
 type Agent struct {
 	UUID      string `gorm:"primaryKey"`
 	Hostname  string

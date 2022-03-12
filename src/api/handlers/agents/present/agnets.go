@@ -8,6 +8,7 @@ import (
 	"github.com/do87/poly/src/api/handlers/agents/models"
 )
 
+// key consts
 const (
 	KEY_AGENT  = "poly:agent"
 	KEY_AGENTS = "poly:agents"
@@ -22,6 +23,7 @@ type agent struct {
 	UpdatedAt time.Time `json:"updated_at"`
 }
 
+// FromModel converts model to presenter struct
 func (agent) FromModel(m models.Agent) agent {
 	return agent{
 		UUID:      m.UUID,
@@ -33,6 +35,7 @@ func (agent) FromModel(m models.Agent) agent {
 	}
 }
 
+// Agents presents agents
 func Agents(agentModels []models.Agent) Presentor {
 	p := make([]agent, 0)
 	a := agent{}
@@ -44,6 +47,7 @@ func Agents(agentModels []models.Agent) Presentor {
 	return wrap(KEY_AGENTS, etag.Generate(u, true), p)
 }
 
+// Agent presents agent
 func Agent(m models.Agent) Presentor {
 	a := agent{}
 	u := fmt.Sprintf("%s-%s-%s;", m.UUID, m.Hostname, m.UpdatedAt.String())

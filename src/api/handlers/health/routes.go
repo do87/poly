@@ -7,7 +7,7 @@ import (
 )
 
 // setRoutes attaches product routes
-func (p *Health) setRoutes() *Health {
+func (p *health) setRoutes() *health {
 	p.route.Get("/.well-known/live", live())
 	return p
 }

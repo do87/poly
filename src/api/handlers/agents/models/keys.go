@@ -4,6 +4,7 @@ import (
 	"time"
 )
 
+// Key model
 type Key struct {
 	UUID      string
 	Name      string
