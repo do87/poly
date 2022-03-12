@@ -12,6 +12,7 @@ type handler struct {
 	repo   *repos.Repo
 	uc     *usecases.Usecase
 	agents *agents
+	keys   *keys
 }
 
 func Handler(r *chi.Mux, d *db.DB) {
@@ -20,8 +21,12 @@ func Handler(r *chi.Mux, d *db.DB) {
 		route: r,
 		repo:  repo,
 
+		// Link usecases:
 		agents: &agents{
 			uc: usecases.NewAgentsUsecase(repo.Agents),
+		},
+		keys: &keys{
+			uc: usecases.NewAgentKeysUsecase(repo.Keys),
 		},
 	}
 	p.setRoutes()

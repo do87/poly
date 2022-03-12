@@ -12,11 +12,11 @@ type agentsRepo struct {
 }
 
 // Get returns agent by UUID
-func (r *agentsRepo) Get(ctx context.Context, id string) (agents []models.Agent, err error) {
+func (r *agentsRepo) Get(ctx context.Context, id string) (agents models.Agent, err error) {
 	var agent models.Agent
 	result := r.db.First(&agent, "uuid = ?", id)
 	if result.Error != nil {
-		return nil, result.Error
+		return models.Agent{}, result.Error
 	}
 	return agents, nil
 }

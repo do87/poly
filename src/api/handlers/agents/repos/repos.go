@@ -8,6 +8,7 @@ import (
 // Repo service
 type Repo struct {
 	Agents *agentsRepo
+	Keys   *keysRepo
 }
 
 // New returns a new repo service
