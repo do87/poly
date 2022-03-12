@@ -24,13 +24,19 @@ type agent struct {
 	runLock      sync.Mutex
 }
 
+// Plan is a type of a polytree
 type Plan = polytree.Tree
+
+// Job is a type of node in the polytree
 type Job = polytree.Node
+
+// Exec is the node execution function
 type Exec = polytree.Exec
 
+// Labels are the agent labels
 type Labels map[string]string
 
-func (a *agent) execute(ctx context.Context, log *logger.Logger, plan *Plan, request *Request) {
+func (a *agent) execute(ctx context.Context, log *logger.Logger, plan *Plan, request *request) {
 	t := (*polytree.Tree)(plan).Init()
 	t.ExecuteWithTimeout(ctx, log, request.ID, request.Payload, a.PlanTimeout)
 	a.done(ctx, log, plan)
@@ -99,7 +105,7 @@ func (a *agent) Run(ctx context.Context) {
 	}
 }
 
-type Request struct {
+type request struct {
 	ID      string
 	Plan    string
 	Payload []byte
@@ -107,7 +113,7 @@ type Request struct {
 
 // poll checks api for new plan requests
 func (a *agent) poll(ctx context.Context, log *logger.Logger) {
-	request := &Request{
+	request := &request{
 		ID:      "1",
 		Plan:    "plan:infra:v1",
 		Payload: []byte(`{"env": "dev"}`),
@@ -117,7 +123,7 @@ func (a *agent) poll(ctx context.Context, log *logger.Logger) {
 }
 
 // processRequest find plan keys that match the request
-func (a *agent) processRequest(ctx context.Context, log *logger.Logger, request *Request) {
+func (a *agent) processRequest(ctx context.Context, log *logger.Logger, request *request) {
 	var plan *Plan
 	for _, p := range a.plans {
 		if strings.EqualFold(p.Key, request.Plan) {

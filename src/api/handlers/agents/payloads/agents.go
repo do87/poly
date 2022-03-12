@@ -2,6 +2,7 @@ package payloads
 
 import "github.com/do87/poly/src/api/handlers/agents/models"
 
+// AgentRegister is the payload needed to register an agent
 type AgentRegister struct {
 	UUID     string   `json:"id"`
 	Hostname string   `json:"hostname"`

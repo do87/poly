@@ -12,14 +12,17 @@ import (
 	"github.com/go-chi/render"
 )
 
+// Handler defines routes for a service
 type Handler func(*chi.Mux, *db.DB)
 
+// Config is the API config
 type Config struct {
 	BindAddr string
 	BindPort int
 	DBConn   string
 }
 
+// cleanup is a type of a function to defer
 type cleanup func() error
 type api struct {
 	router  *chi.Mux
@@ -29,6 +32,7 @@ type api struct {
 	cleanup []cleanup
 }
 
+// New creates a new API
 func New(c Config) *api {
 	log, logsync := logger.New()
 	api := &api{
@@ -53,6 +57,7 @@ func (a *api) setupDatabase() {
 	a.cleanup = append(a.cleanup, db.Close)
 }
 
+// Register registers the API
 func (a *api) Register(handlers ...Handler) *api {
 	for _, handler := range handlers {
 		handler(a.router, a.db)
@@ -60,6 +65,7 @@ func (a *api) Register(handlers ...Handler) *api {
 	return a
 }
 
+// Run runs the API
 func (a *api) Run() {
 	defer a.Cleanup()
 	a.log.Info("running server...", "host", a.serverStr())
@@ -68,6 +74,7 @@ func (a *api) Run() {
 	}
 }
 
+// Cleanup run cleanup functions
 func (a *api) Cleanup() {
 	for _, c := range a.cleanup {
 		c()
