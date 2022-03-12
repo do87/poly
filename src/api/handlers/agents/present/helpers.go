@@ -18,6 +18,9 @@ func wrap(kind, etag string, data interface{}) Presentor {
 	}
 }
 
+// Generic makes wrap functionality public
+var Generic = wrap
+
 type errorPayload struct {
 	HTTPStatus int    `json:"httpStatus"`
 	Error      string `json:"error,omitempty"`

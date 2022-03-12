@@ -33,3 +33,13 @@ func (a *agents) register(u *usecases.Usecase) http.HandlerFunc {
 		render.JSON(w, r, present.Agent(agent))
 	}
 }
+
+func (a *agents) deregister(u *usecases.Usecase) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		if err := u.Agents.Deregister(r.Context(), r); err != nil {
+			render.JSON(w, r, present.Error(w, r, http.StatusInternalServerError, err))
+			return
+		}
+		render.JSON(w, r, present.Generic(present.KEY_AGENT, "", nil))
+	}
+}
