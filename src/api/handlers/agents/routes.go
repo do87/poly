@@ -4,7 +4,6 @@ package agents
 func (a *handler) setRoutes() *handler {
 	a.route.Get("/agents", a.agents.list(a.uc))              // list all agents
 	a.route.Post("/agent", a.agents.register(a.uc))          // agent registration
-	a.route.Post("/agent/{id}/poll", nil)                    // agent API polling
 	a.route.Delete("/agent/{id}", a.agents.deregister(a.uc)) // Deregisters an agent by ID
 
 	a.route.Get("/agents/keys", nil)        // list agent keys
