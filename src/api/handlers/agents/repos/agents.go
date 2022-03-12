@@ -11,7 +11,17 @@ type agentsRepo struct {
 	db *gorm.DB
 }
 
-// List returns all products
+// Get returns agent by UUID
+func (r *agentsRepo) Get(ctx context.Context, id string) (agents []models.Agent, err error) {
+	var agent models.Agent
+	result := r.db.First(&agent, "uuid = ?", id)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return agents, nil
+}
+
+// List returns all agents
 func (r *agentsRepo) List(ctx context.Context) (agents []models.Agent, err error) {
 	result := r.db.Order("uuid ASC").Find(&agents)
 	if result.Error != nil {
@@ -29,9 +39,13 @@ func (r *agentsRepo) Register(ctx context.Context, agent models.Agent) (models.A
 }
 
 // Deregister unregisters the agent
-func (r *agentsRepo) Deregister(ctx context.Context, agent models.Agent) error {
-	if result := r.db.Delete(&agent); result.Error != nil {
-		return result.Error
+func (r *agentsRepo) Deregister(ctx context.Context, id string) error {
+	a, err := r.Get(ctx, id)
+	if err != nil {
+		return err
+	}
+	if err := r.db.Delete(&a).Error; err != nil {
+		return err
 	}
 	return nil
 }

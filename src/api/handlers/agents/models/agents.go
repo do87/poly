@@ -7,8 +7,8 @@ import (
 )
 
 type Agent struct {
-	UUID      string         `gorm:"primaryKey"`
-	Hostname  string         `gorm:"primaryKey"`
+	UUID      string `gorm:"primaryKey"`
+	Hostname  string
 	Labels    pq.StringArray `gorm:"type:text[]"`
 	Plans     pq.StringArray `gorm:"type:text[]"`
 	CreatedAt time.Time

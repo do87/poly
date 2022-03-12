@@ -13,7 +13,7 @@ import (
 type AgentsRepository interface {
 	List(ctx context.Context) ([]models.Agent, error)
 	Register(ctx context.Context, agent models.Agent) (models.Agent, error)
-	Deregister(ctx context.Context, agent models.Agent) error
+	Deregister(ctx context.Context, id string) error
 }
 
 // NewAgentsUsecase creates a new Usecase service
@@ -44,10 +44,6 @@ func (u *agentsUsecase) Register(ctx context.Context, r *http.Request) (agent mo
 }
 
 // Deregister unregisters an agent
-func (u *agentsUsecase) Deregister(ctx context.Context, r *http.Request) (err error) {
-	var payload payloads.AgentDeregister
-	if err = json.NewDecoder(r.Body).Decode(&payload); err != nil {
-		return
-	}
-	return u.repo.Deregister(ctx, payload.ToModel())
+func (u *agentsUsecase) Deregister(ctx context.Context, r *http.Request, id string) (err error) {
+	return u.repo.Deregister(ctx, id)
 }

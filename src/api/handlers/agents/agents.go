@@ -5,6 +5,7 @@ import (
 
 	"github.com/do87/poly/src/api/handlers/agents/present"
 	"github.com/do87/poly/src/api/handlers/agents/usecases"
+	"github.com/go-chi/chi"
 	"github.com/go-chi/render"
 )
 
@@ -36,7 +37,8 @@ func (a *agents) register(u *usecases.Usecase) http.HandlerFunc {
 
 func (a *agents) deregister(u *usecases.Usecase) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		if err := u.Agents.Deregister(r.Context(), r); err != nil {
+		id := chi.URLParam(r, "id")
+		if err := u.Agents.Deregister(r.Context(), r, id); err != nil {
 			render.JSON(w, r, present.Error(w, r, http.StatusInternalServerError, err))
 			return
 		}

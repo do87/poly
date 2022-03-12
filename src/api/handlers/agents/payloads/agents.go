@@ -18,16 +18,3 @@ func (a *AgentRegister) ToModel() models.Agent {
 		Plans:    a.Plans,
 	}
 }
-
-type AgentDeregister struct {
-	UUID     string `json:"id"`
-	Hostname string `json:"hostname"`
-}
-
-// ToModel converts payload to model
-func (a *AgentDeregister) ToModel() models.Agent {
-	return models.Agent{
-		UUID:     a.UUID,
-		Hostname: a.Hostname,
-	}
-}
