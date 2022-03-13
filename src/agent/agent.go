@@ -33,12 +33,19 @@ type Job = polytree.Node
 // Exec is the node execution function
 type Exec = polytree.Exec
 
-// Labels are the agent labels
-type Labels map[string]string
-
 // Config represents the agent config
 type Config struct {
 	Labels Labels
+	Key    Key
+}
+
+// Labels are the agent labels
+type Labels map[string]string
+
+// Key represents an agent key
+type Key struct {
+	Name       string
+	PrivateKey string
 }
 
 func (a *agent) execute(ctx context.Context, log *logger.Logger, plan *Plan, request *request) {
