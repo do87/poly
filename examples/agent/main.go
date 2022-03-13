@@ -10,8 +10,10 @@ import (
 func main() {
 	ctx := context.Background()
 
-	agent.New(agent.Labels{
-		"infra": "prod",
+	agent.New(agent.Config{
+		Labels: agent.Labels{
+			"infra": "prod",
+		},
 	}).Register(
 		infra.Plan(),
 	).Run(ctx)

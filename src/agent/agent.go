@@ -13,6 +13,11 @@ import (
 	"github.com/do87/poly/src/polytree"
 )
 
+// config type consts
+const (
+	CONFIG_TYPE_LABELS = "Labels"
+)
+
 // agent is the agent service
 type agent struct {
 	MaxParallel  int              // Max plans running in parallel
@@ -35,6 +40,10 @@ type Exec = polytree.Exec
 
 // Labels are the agent labels
 type Labels map[string]string
+
+type Config struct {
+	Labels Labels
+}
 
 func (a *agent) execute(ctx context.Context, log *logger.Logger, plan *Plan, request *request) {
 	t := (*polytree.Tree)(plan).Init()
@@ -64,15 +73,25 @@ func (a *agent) removeFromRunning(plan *Plan) {
 }
 
 // New returens a new agent
-func New(labels Labels) *agent {
+func New(cfg ...Config) *agent {
 	a := &agent{
 		MaxParallel:  3,
 		PlanTimeout:  2 * time.Hour,
 		PollInterval: 5 * time.Second,
 		plans:        map[string]*Plan{},
-		labels:       labels,
+		labels:       Labels{},
+	}
+	for _, c := range cfg {
+		a.SetLabels(c.Labels)
 	}
 	return a
+}
+
+// SetLabels sets agent labels
+func (a *agent) SetLabels(l Labels) {
+	for k, v := range l {
+		a.labels[k] = v
+	}
 }
 
 // Register register plans to agent
