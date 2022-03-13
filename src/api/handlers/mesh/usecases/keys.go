@@ -40,8 +40,7 @@ func (u *keysUsecase) Create(ctx context.Context, r *http.Request) (key models.K
 	if err = json.NewDecoder(r.Body).Decode(&payload); err != nil {
 		return
 	}
-	model := payload.ToModel()
-	return u.repo.Create(ctx, model)
+	return u.repo.Create(ctx, payload.ToModel())
 }
 
 // Delete unregisters an key
