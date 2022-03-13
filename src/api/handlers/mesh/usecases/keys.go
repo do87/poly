@@ -16,7 +16,7 @@ type KeysRepository interface {
 	Delete(ctx context.Context, id string) error
 }
 
-// NewAgentKeysUsecase creates a new Usecase service
+// NewKeysUsecase creates a new Usecase service
 func NewKeysUsecase(keys KeysRepository) *Usecase {
 	return &Usecase{
 		Keys: &keysUsecase{
