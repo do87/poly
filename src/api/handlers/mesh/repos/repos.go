@@ -15,6 +15,7 @@ type Repo struct {
 func New(d *db.DB) *Repo {
 	if err := d.Migrate(
 		models.Agent{},
+		models.Key{},
 	); err != nil {
 		panic(err)
 	}

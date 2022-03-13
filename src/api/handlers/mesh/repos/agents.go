@@ -38,7 +38,7 @@ func (r *agentsRepo) Register(ctx context.Context, agent models.Agent) (models.A
 	return agent, nil
 }
 
-// Deregister unregisters the agent
+// Deregister deletes the agent by uuid
 func (r *agentsRepo) Deregister(ctx context.Context, id string) error {
 	a, err := r.Get(ctx, id)
 	if err != nil {
