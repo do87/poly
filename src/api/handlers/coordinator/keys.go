@@ -1,10 +1,10 @@
-package agents
+package coordinator
 
 import (
 	"net/http"
 
-	"github.com/do87/poly/src/api/handlers/agents/present"
-	"github.com/do87/poly/src/api/handlers/agents/usecases"
+	"github.com/do87/poly/src/api/handlers/coordinator/present"
+	"github.com/do87/poly/src/api/handlers/coordinator/usecases"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/render"
 )

@@ -1,8 +1,8 @@
-package agents
+package coordinator
 
 import (
-	"github.com/do87/poly/src/api/handlers/agents/repos"
-	"github.com/do87/poly/src/api/handlers/agents/usecases"
+	"github.com/do87/poly/src/api/handlers/coordinator/repos"
+	"github.com/do87/poly/src/api/handlers/coordinator/usecases"
 	"github.com/do87/poly/src/db"
 	"github.com/go-chi/chi/v5"
 )

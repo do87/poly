@@ -3,7 +3,7 @@ package payloads
 import (
 	"time"
 
-	"github.com/do87/poly/src/api/handlers/agents/models"
+	"github.com/do87/poly/src/api/handlers/coordinator/models"
 )
 
 // KeyCreate is the payload for creating agent key

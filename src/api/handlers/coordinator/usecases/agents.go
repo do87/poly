@@ -5,8 +5,8 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/do87/poly/src/api/handlers/agents/models"
-	"github.com/do87/poly/src/api/handlers/agents/payloads"
+	"github.com/do87/poly/src/api/handlers/coordinator/models"
+	"github.com/do87/poly/src/api/handlers/coordinator/payloads"
 )
 
 // AgentsRepository is the allowed usecase repo for agents
