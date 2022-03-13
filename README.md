@@ -1,5 +1,5 @@
-[![Go Report Card](https://goreportcard.com/badge/github.com/do87/poly/src)](https://goreportcard.com/report/github.com/do87/poly/src)
 
+<a href="https://goreportcard.com/report/github.com/do87/poly/src"><img src="https://goreportcard.com/badge/github.com/do87/poly/src" alt="Go report card></a>
 
 # Poly
 
