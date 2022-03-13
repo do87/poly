@@ -13,11 +13,6 @@ import (
 	"github.com/do87/poly/src/polytree"
 )
 
-// config type consts
-const (
-	CONFIG_TYPE_LABELS = "Labels"
-)
-
 // agent is the agent service
 type agent struct {
 	MaxParallel  int              // Max plans running in parallel
