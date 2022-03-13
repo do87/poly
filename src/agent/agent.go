@@ -36,6 +36,7 @@ type Exec = polytree.Exec
 // Labels are the agent labels
 type Labels map[string]string
 
+// Config represents the agent config
 type Config struct {
 	Labels Labels
 }
