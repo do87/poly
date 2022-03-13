@@ -1,4 +1,4 @@
-package coordinator
+package mesh
 
 // setRoutes attaches product routes
 func (h *handler) setRoutes() *handler {

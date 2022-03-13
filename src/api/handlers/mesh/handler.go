@@ -1,8 +1,8 @@
-package coordinator
+package mesh
 
 import (
-	"github.com/do87/poly/src/api/handlers/coordinator/repos"
-	"github.com/do87/poly/src/api/handlers/coordinator/usecases"
+	"github.com/do87/poly/src/api/handlers/mesh/repos"
+	"github.com/do87/poly/src/api/handlers/mesh/usecases"
 	"github.com/do87/poly/src/db"
 	"github.com/go-chi/chi/v5"
 )

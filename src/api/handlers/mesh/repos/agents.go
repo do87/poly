@@ -3,7 +3,7 @@ package repos
 import (
 	"context"
 
-	"github.com/do87/poly/src/api/handlers/coordinator/models"
+	"github.com/do87/poly/src/api/handlers/mesh/models"
 	"gorm.io/gorm"
 )
 

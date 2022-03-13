@@ -1,10 +1,10 @@
-package coordinator
+package mesh
 
 import (
 	"net/http"
 
-	"github.com/do87/poly/src/api/handlers/coordinator/present"
-	"github.com/do87/poly/src/api/handlers/coordinator/usecases"
+	"github.com/do87/poly/src/api/handlers/mesh/present"
+	"github.com/do87/poly/src/api/handlers/mesh/usecases"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/render"
 )

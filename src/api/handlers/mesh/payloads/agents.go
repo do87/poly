@@ -1,6 +1,6 @@
 package payloads
 
-import "github.com/do87/poly/src/api/handlers/coordinator/models"
+import "github.com/do87/poly/src/api/handlers/mesh/models"
 
 // AgentRegister is the payload needed to register an agent
 type AgentRegister struct {

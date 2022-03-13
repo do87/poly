@@ -5,8 +5,8 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/do87/poly/src/api/handlers/coordinator/models"
-	"github.com/do87/poly/src/api/handlers/coordinator/payloads"
+	"github.com/do87/poly/src/api/handlers/mesh/models"
+	"github.com/do87/poly/src/api/handlers/mesh/payloads"
 )
 
 // KeysRepository is the usecase repo for key keys

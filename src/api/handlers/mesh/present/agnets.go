@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/amalfra/etag"
-	"github.com/do87/poly/src/api/handlers/coordinator/models"
+	"github.com/do87/poly/src/api/handlers/mesh/models"
 )
 
 // key consts
