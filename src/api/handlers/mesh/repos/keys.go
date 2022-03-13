@@ -44,7 +44,7 @@ func (r *keysRepo) Delete(ctx context.Context, id string) error {
 	if err != nil {
 		return err
 	}
-	if err := r.db.Delete(&a).Error; err != nil {
+	if err := r.db.Delete(&a, "uuid = ?", id).Error; err != nil {
 		return err
 	}
 	return nil

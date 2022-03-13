@@ -9,6 +9,7 @@ require (
 	github.com/go-chi/chi/v5 v5.0.7
 	github.com/go-chi/render v1.0.1
 	github.com/lib/pq v1.10.2
+	github.com/pkg/errors v0.8.1
 	go.uber.org/zap v1.21.0
 	gorm.io/driver/postgres v1.3.1
 	gorm.io/gorm v1.23.2
