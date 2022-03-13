@@ -26,7 +26,7 @@ func Handler(r *chi.Mux, d *db.DB) {
 			uc: usecases.NewAgentsUsecase(repo.Agents),
 		},
 		keys: &keys{
-			uc: usecases.NewAgentKeysUsecase(repo.Keys),
+			uc: usecases.NewKeysUsecase(repo.Keys),
 		},
 	}
 	p.setRoutes()

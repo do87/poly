@@ -17,7 +17,7 @@ type KeysRepository interface {
 }
 
 // NewAgentKeysUsecase creates a new Usecase service
-func NewAgentKeysUsecase(keys KeysRepository) *Usecase {
+func NewKeysUsecase(keys KeysRepository) *Usecase {
 	return &Usecase{
 		Keys: &keysUsecase{
 			repo: keys,
@@ -40,7 +40,8 @@ func (u *keysUsecase) Create(ctx context.Context, r *http.Request) (key models.K
 	if err = json.NewDecoder(r.Body).Decode(&payload); err != nil {
 		return
 	}
-	return u.repo.Create(ctx, payload.ToModel())
+	model := payload.ToModel()
+	return u.repo.Create(ctx, model)
 }
 
 // Delete unregisters an key

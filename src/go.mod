@@ -4,6 +4,7 @@ go 1.17
 
 require (
 	github.com/amalfra/etag v1.0.0
+	github.com/docker/distribution v2.8.1+incompatible
 	github.com/go-chi/chi v1.5.4
 	github.com/go-chi/chi/v5 v5.0.7
 	github.com/go-chi/render v1.0.1
