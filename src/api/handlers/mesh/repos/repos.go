@@ -23,5 +23,8 @@ func New(d *db.DB) *Repo {
 		Agents: &agentsRepo{
 			db: d.GetDB(),
 		},
+		Keys: &keysRepo{
+			db: d.GetDB(),
+		},
 	}
 }
