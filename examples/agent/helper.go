@@ -1,8 +1,10 @@
 package main
 
-import "github.com/do87/poly/src/agent"
+import (
+	"github.com/do87/poly/src/auth"
+)
 
-var exampleKey = agent.Key{
+var exampleKey = auth.AgentRegisterKey{
 	Name: "pubkey:v1",
 	PrivateKey: []byte(`-----BEGIN RSA PRIVATE KEY-----
 	MIICXQIBAAKBgQCfZSwSf28T9xoM1Hu2OETCLhEaaEjbmEYXTRvA7aIS9aHg6ToE
