@@ -26,3 +26,9 @@ func (k KeyCreate) ToModel() models.Key {
 		ExpiresAt: k.ExpiresAt,
 	}
 }
+
+// EncodedKey is the key related payload used during agent registration
+type EncodedKey struct {
+	Name    string `json:"name"`
+	Encoded string `json:"key"`
+}

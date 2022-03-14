@@ -10,6 +10,7 @@ import (
 type Agent struct {
 	UUID      string `gorm:"primaryKey"`
 	Hostname  string
+	KeyUUID   string
 	Labels    pq.StringArray `gorm:"type:text[]"`
 	Plans     pq.StringArray `gorm:"type:text[]"`
 	CreatedAt time.Time

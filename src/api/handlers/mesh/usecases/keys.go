@@ -11,6 +11,7 @@ import (
 
 // KeysRepository is the usecase repo for key keys
 type KeysRepository interface {
+	GetByName(ctx context.Context, name string) (models.Key, error)
 	List(ctx context.Context) ([]models.Key, error)
 	Create(ctx context.Context, key models.Key) (models.Key, error)
 	Delete(ctx context.Context, id string) error

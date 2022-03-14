@@ -22,6 +22,7 @@ type agent struct {
 	labels       Labels           // worker tags for filtering requests
 	running      []string         // list of keys of running plans
 	runLock      sync.Mutex
+	hostname     string
 }
 
 // Plan is a type of a polytree
@@ -37,6 +38,7 @@ type Exec = polytree.Exec
 type Config struct {
 	Labels Labels
 	Key    Key
+	Host   string
 }
 
 // Labels are the agent labels
@@ -45,7 +47,7 @@ type Labels map[string]string
 // Key represents an agent key
 type Key struct {
 	Name       string
-	PrivateKey string
+	PrivateKey []byte
 }
 
 func (a *agent) execute(ctx context.Context, log *logger.Logger, plan *Plan, request *request) {
@@ -60,22 +62,22 @@ func (a *agent) done(ctx context.Context, log *logger.Logger, plan *Plan) *agent
 	return a
 }
 
-// removeFromRunning removes given plan from runnng lst
+// removeFromRunning removes given plan from running lst
 func (a *agent) removeFromRunning(plan *Plan) {
-	newRunnng := []string{}
+	newRunning := []string{}
 	for _, run := range a.running {
 		if run == plan.Key {
 			continue
 		}
-		newRunnng = append(newRunnng, run)
+		newRunning = append(newRunning, run)
 	}
 
 	a.runLock.Lock()
 	defer a.runLock.Unlock()
-	a.running = newRunnng
+	a.running = newRunning
 }
 
-// New returens a new agent
+// New returns a new agent
 func New(cfg ...Config) *agent {
 	a := &agent{
 		MaxParallel:  3,
@@ -83,9 +85,11 @@ func New(cfg ...Config) *agent {
 		PollInterval: 5 * time.Second,
 		plans:        map[string]*Plan{},
 		labels:       Labels{},
+		hostname:     os.Getenv("HOST"),
 	}
 	for _, c := range cfg {
 		a.SetLabels(c.Labels)
+		a.SetHost(c.Host)
 	}
 	return a
 }
@@ -94,6 +98,13 @@ func New(cfg ...Config) *agent {
 func (a *agent) SetLabels(l Labels) {
 	for k, v := range l {
 		a.labels[k] = v
+	}
+}
+
+// SetHost sets agent host
+func (a *agent) SetHost(host string) {
+	if host != "" {
+		a.hostname = host
 	}
 }
 

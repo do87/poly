@@ -4,7 +4,7 @@ import "github.com/do87/poly/src/agent"
 
 var exampleKey = agent.Key{
 	Name: "pubkey:v1",
-	PrivateKey: `-----BEGIN RSA PRIVATE KEY-----
+	PrivateKey: []byte(`-----BEGIN RSA PRIVATE KEY-----
 	MIICXQIBAAKBgQCfZSwSf28T9xoM1Hu2OETCLhEaaEjbmEYXTRvA7aIS9aHg6ToE
 	kz5J2SGxcnlUn+S08AZMcOKgQSk/0x3f/Q13d9jxdLsgEWNJTj4r3iVtXQ2ZxRde
 	WqVpE8i4gpXo24iggoV8VLYZnUC/rGFbtXEhCgqciWEuM4+uLpLeqZAcLwIDAQAB
@@ -18,5 +18,5 @@ var exampleKey = agent.Key{
 	8ocv5+EnpdGCv2WeORZyPGCxIPjGFyX0+pRdGWEA0V39nsrlBCAjEm5u68CNCPQY
 	jzMBsOURmob95i6qjH0DAkBPoeJv709qaLE/BGrqIO4L3nQEOE+2WfWhfchSVTXr
 	ElHl6tuflNipqxO6ArxOJ49l1ZsEPiVttdVqG+fUABH1
-	-----END RSA PRIVATE KEY-----`,
+	-----END RSA PRIVATE KEY-----`),
 }

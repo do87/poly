@@ -21,6 +21,16 @@ func (r *keysRepo) Get(ctx context.Context, id string) (keys models.Key, err err
 	return keys, nil
 }
 
+// GetByName returns key by name
+func (r *keysRepo) GetByName(ctx context.Context, name string) (keys models.Key, err error) {
+	var key models.Key
+	result := r.db.First(&key, "name = ?", name)
+	if result.Error != nil {
+		return models.Key{}, result.Error
+	}
+	return keys, nil
+}
+
 // List returns all keys
 func (r *keysRepo) List(ctx context.Context) (keys []models.Key, err error) {
 	result := r.db.Order("name ASC").Find(&keys)

@@ -14,7 +14,8 @@ func main() {
 		Labels: agent.Labels{
 			"infra": "prod",
 		},
-		Key: exampleKey,
+		Key:  exampleKey,
+		Host: "localhost",
 	}).Register(
 		infra.Plan(),
 	).Run(ctx)

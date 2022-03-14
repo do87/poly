@@ -35,12 +35,21 @@ func (u *agentsUsecase) List(ctx context.Context, r *http.Request) ([]models.Age
 }
 
 // Register registers an agent and returns it
-func (u *agentsUsecase) Register(ctx context.Context, r *http.Request) (agent models.Agent, err error) {
+func (u *agentsUsecase) Register(ctx context.Context, r *http.Request, keysUc *keysUsecase) (agent models.Agent, cookie *http.Cookie, err error) {
 	var payload payloads.AgentRegister
 	if err = json.NewDecoder(r.Body).Decode(&payload); err != nil {
 		return
 	}
-	return u.repo.Register(ctx, payload.ToModel())
+	key, err := keysUc.repo.GetByName(ctx, payload.EncodedKey.Name)
+	if err != nil {
+		return
+	}
+	cookie, err = u.processKey(r, key, payload.EncodedKey.Encoded, payload.Hostname)
+	if err != nil {
+		return
+	}
+	agent, err = u.repo.Register(ctx, payload.ToModel(key.UUID))
+	return
 }
 
 // Deregister unregisters an agent

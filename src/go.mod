@@ -7,6 +7,7 @@ require (
 	github.com/docker/distribution v2.8.1+incompatible
 	github.com/go-chi/chi/v5 v5.0.7
 	github.com/go-chi/render v1.0.1
+	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/lib/pq v1.10.2
 	go.uber.org/zap v1.21.0
 	gorm.io/driver/postgres v1.3.1
