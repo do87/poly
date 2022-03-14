@@ -18,7 +18,7 @@ import (
 // MeshGlobalKey is the env variable name where the global key is stored
 const MeshGlobalKey = "MESH_GLOBAL_KEY"
 
-// GeneralKey handles the mesh API general key
+// General handles the mesh API general key
 type General struct {
 	Key []byte
 }
@@ -50,6 +50,8 @@ func (g *General) Token(hostname string) (string, error) {
 	return t.SignedString(g.Key)
 }
 
+// ValidateGeneralTokenHeader fetches the access token from the authorization header
+// and validates it
 func ValidateGeneralTokenHeader(r *http.Request) (hostname string, err error) {
 	t := extractToken(r)
 	token, err := validateToken(t)

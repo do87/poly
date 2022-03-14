@@ -7,7 +7,8 @@ import (
 	"github.com/do87/poly/src/auth"
 )
 
-func Agents(next http.Handler) http.Handler {
+// VerifyAgent is a middleware to verify an agent's access token
+func VerifyAgent(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		hostname, err := auth.ValidateGeneralTokenHeader(r)
 		if err != nil {
