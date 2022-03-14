@@ -1,6 +1,9 @@
 package mesh
 
 import (
+	"context"
+	"os"
+
 	"github.com/do87/poly/src/api/handlers/mesh/repos"
 	"github.com/do87/poly/src/api/handlers/mesh/usecases"
 	"github.com/do87/poly/src/db"
@@ -29,5 +32,18 @@ func Handler(r *chi.Mux, d *db.DB) {
 			uc: usecases.NewKeysUsecase(repo.Keys),
 		},
 	}
-	p.setRoutes()
+	p.setGlobalKey().setRoutes()
+}
+
+func (h *handler) setGlobalKey() *handler {
+	meshKey := os.Getenv(usecases.MeshGlobalKey)
+	if meshKey != "" {
+		return h
+	}
+	key, err := h.keys.uc.Keys.CreateGlobalKeyIfNotExists(context.Background())
+	if err != nil {
+		panic(err)
+	}
+	os.Setenv(usecases.MeshGlobalKey, string(key.PublicKey))
+	return h
 }

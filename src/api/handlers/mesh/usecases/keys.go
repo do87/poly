@@ -14,6 +14,7 @@ type KeysRepository interface {
 	GetByName(ctx context.Context, name string) (models.Key, error)
 	List(ctx context.Context) ([]models.Key, error)
 	Create(ctx context.Context, key models.Key) (models.Key, error)
+	CreateGlobalKeyIfNotExists(ctx context.Context) (models.Key, error)
 	Delete(ctx context.Context, id string) error
 }
 
@@ -47,4 +48,9 @@ func (u *keysUsecase) Create(ctx context.Context, r *http.Request) (key models.K
 // Delete unregisters an key
 func (u *keysUsecase) Delete(ctx context.Context, r *http.Request, id string) (err error) {
 	return u.repo.Delete(ctx, id)
+}
+
+// CreateGlobalKeyIfNotExists returns global key
+func (u *keysUsecase) CreateGlobalKeyIfNotExists(ctx context.Context) (key models.Key, err error) {
+	return u.repo.CreateGlobalKeyIfNotExists(ctx)
 }
