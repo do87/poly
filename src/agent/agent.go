@@ -9,6 +9,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/do87/poly/src/auth"
 	"github.com/do87/poly/src/logger"
 	"github.com/do87/poly/src/polytree"
 )
@@ -37,18 +38,12 @@ type Exec = polytree.Exec
 // Config represents the agent config
 type Config struct {
 	Labels Labels
-	Key    Key
+	Key    auth.AgentRegisterKey
 	Host   string
 }
 
 // Labels are the agent labels
 type Labels map[string]string
-
-// Key represents an agent key
-type Key struct {
-	Name       string
-	PrivateKey []byte
-}
 
 func (a *agent) execute(ctx context.Context, log *logger.Logger, plan *Plan, request *request) {
 	t := (*polytree.Tree)(plan).Init()

@@ -10,8 +10,9 @@ import (
 
 // key consts
 const (
-	KEY_AGENT  = "poly:agent"
-	KEY_AGENTS = "poly:agents"
+	KEY_AGENT              = "poly:agent"
+	KEY_AGENT_ACCESS_TOKEN = "poly:agent:access-token"
+	KEY_AGENTS             = "poly:agents"
 )
 
 type agent struct {
@@ -52,4 +53,9 @@ func Agent(m models.Agent) Presentor {
 	a := agent{}
 	u := fmt.Sprintf("%s-%s-%s;", m.UUID, m.Hostname, m.UpdatedAt.String())
 	return wrap(KEY_AGENTS, etag.Generate(u, true), a.FromModel(m))
+}
+
+// AccessToken presents agent's access token
+func AccessToken(t string) Presentor {
+	return wrap(KEY_AGENT_ACCESS_TOKEN, etag.Generate(t, true), t)
 }

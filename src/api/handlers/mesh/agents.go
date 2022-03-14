@@ -5,12 +5,14 @@ import (
 
 	"github.com/do87/poly/src/api/handlers/mesh/present"
 	"github.com/do87/poly/src/api/handlers/mesh/usecases"
+	"github.com/do87/poly/src/auth"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
 )
 
 type agents struct {
-	uc *usecases.Usecase
+	uc   *usecases.Usecase
+	auth *auth.General
 }
 
 func (a *agents) list(u *usecases.Usecase) http.HandlerFunc {
@@ -26,13 +28,18 @@ func (a *agents) list(u *usecases.Usecase) http.HandlerFunc {
 
 func (a *agents) register(agentsUc, keysUc *usecases.Usecase) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		agent, cookie, err := agentsUc.Agents.Register(r.Context(), r, keysUc.Keys)
+		agent, err := agentsUc.Agents.Register(r.Context(), r, keysUc.Keys)
 		if err != nil {
 			render.JSON(w, r, present.Error(w, r, http.StatusInternalServerError, err))
 			return
 		}
-		http.SetCookie(w, cookie)
-		render.JSON(w, r, present.Agent(agent))
+		token, err := a.auth.Token(agent.Hostname)
+		if err != nil {
+			render.JSON(w, r, present.Error(w, r, http.StatusInternalServerError, err))
+			return
+		}
+		_ = token
+		render.JSON(w, r, present.AccessToken(token))
 	}
 }
 

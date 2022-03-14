@@ -14,7 +14,7 @@ type KeysRepository interface {
 	GetByName(ctx context.Context, name string) (models.Key, error)
 	List(ctx context.Context) ([]models.Key, error)
 	Create(ctx context.Context, key models.Key) (models.Key, error)
-	CreateGlobalKeyIfNotExists(ctx context.Context) (models.Key, error)
+	FirstOrCreateGeneralKey(ctx context.Context, fallbackKey []byte) (models.Key, error)
 	Delete(ctx context.Context, id string) error
 }
 
@@ -50,7 +50,8 @@ func (u *keysUsecase) Delete(ctx context.Context, r *http.Request, id string) (e
 	return u.repo.Delete(ctx, id)
 }
 
-// CreateGlobalKeyIfNotExists returns global key
-func (u *keysUsecase) CreateGlobalKeyIfNotExists(ctx context.Context) (key models.Key, err error) {
-	return u.repo.CreateGlobalKeyIfNotExists(ctx)
+// FirstOrCreateGeneralKey returns a general key
+// if the key doesn't exist, a new one will be created based on the fallbackKey string
+func (u *keysUsecase) FirstOrCreateGeneralKey(ctx context.Context, fallbackKey []byte) (key models.Key, err error) {
+	return u.repo.FirstOrCreateGeneralKey(ctx, fallbackKey)
 }

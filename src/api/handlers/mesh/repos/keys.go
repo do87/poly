@@ -3,7 +3,6 @@ package repos
 import (
 	"context"
 
-	"github.com/dchest/uniuri"
 	"github.com/do87/poly/src/api/handlers/mesh/models"
 	"gorm.io/gorm"
 )
@@ -30,8 +29,8 @@ func (r *keysRepo) GetByName(ctx context.Context, name string) (key models.Key, 
 	return
 }
 
-// CreateGlobalKeyIfNotExists returns the global worker key or creates a new one if one doesn't exist
-func (r *keysRepo) CreateGlobalKeyIfNotExists(ctx context.Context) (key models.Key, err error) {
+// FirstOrCreateGeneralKey returns the global worker key or creates a new one if one doesn't exist
+func (r *keysRepo) FirstOrCreateGeneralKey(ctx context.Context, fallbackKey []byte) (key models.Key, err error) {
 	result := r.db.First(&key, "uuid = ? AND name = ?", "global", "global")
 	if result.Error == nil {
 		return
@@ -39,7 +38,7 @@ func (r *keysRepo) CreateGlobalKeyIfNotExists(ctx context.Context) (key models.K
 	key = models.Key{
 		UUID:      "global",
 		Name:      "global",
-		PublicKey: []byte(uniuri.New()),
+		PublicKey: fallbackKey,
 	}
 	if result := r.db.FirstOrCreate(&key); result.Error != nil {
 		return key, result.Error
