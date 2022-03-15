@@ -46,10 +46,11 @@ func (a *agents) register(agentsUc, keysUc *usecases.Usecase) http.HandlerFunc {
 func (a *agents) deregister(u *usecases.Usecase) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		id := chi.URLParam(r, "id")
-		if err := u.Agents.Deregister(r.Context(), r, id); err != nil {
+		a, err := u.Agents.Deregister(r.Context(), r, id)
+		if err != nil {
 			render.JSON(w, r, present.Error(w, r, http.StatusInternalServerError, err))
 			return
 		}
-		render.JSON(w, r, present.Generic(present.KEY_AGENT, "", nil))
+		render.JSON(w, r, present.Generic(present.KEY_AGENT, "", a))
 	}
 }

@@ -14,7 +14,7 @@ import (
 type AgentsRepository interface {
 	List(ctx context.Context) ([]models.Agent, error)
 	Register(ctx context.Context, agent models.Agent) (models.Agent, error)
-	Deregister(ctx context.Context, id string) error
+	Deregister(ctx context.Context, id string) (models.Agent, error)
 }
 
 // NewAgentsUsecase creates a new Usecase service
@@ -52,6 +52,6 @@ func (u *agentsUsecase) Register(ctx context.Context, r *http.Request, keysUc *k
 }
 
 // Deregister unregisters an agent
-func (u *agentsUsecase) Deregister(ctx context.Context, r *http.Request, id string) (err error) {
+func (u *agentsUsecase) Deregister(ctx context.Context, r *http.Request, id string) (models.Agent, error) {
 	return u.repo.Deregister(ctx, id)
 }

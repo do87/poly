@@ -39,13 +39,10 @@ func (r *agentsRepo) Register(ctx context.Context, agent models.Agent) (models.A
 }
 
 // Deregister deletes the agent by uuid
-func (r *agentsRepo) Deregister(ctx context.Context, id string) error {
-	a, err := r.Get(ctx, id)
-	if err != nil {
-		return err
+func (r *agentsRepo) Deregister(ctx context.Context, id string) (models.Agent, error) {
+	a := models.Agent{}
+	if err := r.db.Model(&a).Where("uuid = ?", id).Update("active", false).Error; err != nil {
+		return a, err
 	}
-	if err := r.db.Delete(&a, "uuid = ?", id).Error; err != nil {
-		return err
-	}
-	return nil
+	return a, nil
 }

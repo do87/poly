@@ -13,6 +13,7 @@ type Agent struct {
 	KeyUUID   string
 	Labels    pq.StringArray `gorm:"type:text[]"`
 	Plans     pq.StringArray `gorm:"type:text[]"`
+	Active    bool           `gorm:"default:true"`
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }
