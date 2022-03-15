@@ -63,7 +63,7 @@ func (a *agent) execute(ctx context.Context, log *logger.Logger, plan *Plan, req
 }
 
 func (a *agent) done(ctx context.Context, log *logger.Logger, plan *Plan) *agent { // TODO: tell API when execution finished
-	log.Info("removing plan from agent running plans list", "plan", plan.Key)
+	log.Info("removing plan from agent's running plans list", "plan", plan.Key)
 	a.removeFromRunning(plan)
 	return a
 }
@@ -162,7 +162,7 @@ func (a *agent) Run(ctx context.Context) {
 		case <-ticker.C:
 			a.poll(ctx, log)
 		case <-ctx.Done():
-			a.eol(stop)
+			a.eol(log, stop)
 			return
 		}
 	}

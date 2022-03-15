@@ -47,7 +47,7 @@ func (r *keysRepo) List(ctx context.Context) (keys []models.Key, err error) {
 
 // Create a new key
 func (r *keysRepo) Create(ctx context.Context, key models.Key) (models.Key, error) {
-	if result := r.db.FirstOrCreate(&key); result.Error != nil {
+	if result := r.db.FirstOrCreate(&key, "name = ?", key.Name); result.Error != nil {
 		return key, result.Error
 	}
 	return key, nil
