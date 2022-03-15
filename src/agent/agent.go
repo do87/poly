@@ -104,9 +104,7 @@ func New(cfg ...Config) *agent {
 
 // SetLabels sets agent labels
 func (a *agent) SetLabels(l Labels) {
-	for k, v := range l {
-		a.labels[k] = v
-	}
+	a.labels = append(a.labels, l...)
 }
 
 // SetHost sets agent host

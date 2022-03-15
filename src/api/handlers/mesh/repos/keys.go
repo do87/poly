@@ -11,17 +11,8 @@ type keysRepo struct {
 	db *gorm.DB
 }
 
-// Get returns key by UUID
-func (r *keysRepo) Get(ctx context.Context, id string) (key models.Key, err error) {
-	result := r.db.First(&key, "uuid = ?", id)
-	if result.Error != nil {
-		return models.Key{}, result.Error
-	}
-	return
-}
-
-// GetByName returns key by name
-func (r *keysRepo) GetByName(ctx context.Context, name string) (key models.Key, err error) {
+// Get returns key by name
+func (r *keysRepo) Get(ctx context.Context, name string) (key models.Key, err error) {
 	result := r.db.First(&key, "name = ?", name)
 	if result.Error != nil {
 		return models.Key{}, result.Error
@@ -31,13 +22,12 @@ func (r *keysRepo) GetByName(ctx context.Context, name string) (key models.Key, 
 
 // FirstOrCreateGeneralKey returns the global worker key or creates a new one if one doesn't exist
 func (r *keysRepo) FirstOrCreateGeneralKey(ctx context.Context, fallbackKey []byte) (key models.Key, err error) {
-	result := r.db.First(&key, "uuid = ? AND name = ?", "global", "global")
+	result := r.db.First(&key, "name = ?", "general")
 	if result.Error == nil {
 		return
 	}
 	key = models.Key{
-		UUID:      "global",
-		Name:      "global",
+		Name:      "general",
 		PublicKey: fallbackKey,
 	}
 	if result := r.db.FirstOrCreate(&key); result.Error != nil {
@@ -63,13 +53,13 @@ func (r *keysRepo) Create(ctx context.Context, key models.Key) (models.Key, erro
 	return key, nil
 }
 
-// Delete a key by uuid
-func (r *keysRepo) Delete(ctx context.Context, id string) error {
-	a, err := r.Get(ctx, id)
+// Delete a key by name
+func (r *keysRepo) Delete(ctx context.Context, name string) error {
+	a, err := r.Get(ctx, name)
 	if err != nil {
 		return err
 	}
-	if err := r.db.Delete(&a, "uuid = ?", id).Error; err != nil {
+	if err := r.db.Delete(&a, "name = ?", name).Error; err != nil {
 		return err
 	}
 	return nil

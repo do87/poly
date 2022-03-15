@@ -41,14 +41,14 @@ func (u *agentsUsecase) Register(ctx context.Context, r *http.Request, keysUc *k
 	if err = json.NewDecoder(r.Body).Decode(&payload); err != nil {
 		return
 	}
-	key, err := keysUc.repo.GetByName(ctx, payload.EncodedKey.Name)
+	key, err := keysUc.repo.Get(ctx, payload.EncodedKey.Name)
 	if err != nil {
 		return
 	}
 	if err = common.ProcessRegisterKey(key, payload); err != nil {
 		return
 	}
-	return u.repo.Register(ctx, payload.ToModel(key.UUID))
+	return u.repo.Register(ctx, payload.ToModel(key.Name))
 }
 
 // Deregister unregisters an agent

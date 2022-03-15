@@ -15,8 +15,8 @@ func (h *handler) setRoutes() *handler {
 		h.route.Delete("/agent/{id}", h.agents.deregister(h.agents.uc)) // Deregisters an agent by ID
 	})
 
-	h.route.Get("/agents/keys", h.keys.list(h.keys.uc))          // list agent keys
-	h.route.Post("/agents/key", h.keys.create(h.keys.uc))        // create a new agent key
-	h.route.Delete("/agents/key/{id}", h.keys.delete(h.keys.uc)) // Delete an agent key by ID
+	h.route.Get("/agents/keys", h.keys.list(h.keys.uc))            // list agent keys
+	h.route.Post("/agents/key", h.keys.create(h.keys.uc))          // create a new agent key
+	h.route.Delete("/agents/key/{name}", h.keys.delete(h.keys.uc)) // Delete an agent key by ID
 	return h
 }

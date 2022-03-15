@@ -37,7 +37,7 @@ func (k *keys) create(u *usecases.Usecase) http.HandlerFunc {
 
 func (k *keys) delete(u *usecases.Usecase) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		id := chi.URLParam(r, "id")
+		id := chi.URLParam(r, "name")
 		if err := u.Keys.Delete(r.Context(), r, id); err != nil {
 			render.JSON(w, r, present.Error(w, r, http.StatusInternalServerError, err))
 			return

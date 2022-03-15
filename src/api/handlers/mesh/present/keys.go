@@ -8,14 +8,13 @@ import (
 	"github.com/do87/poly/src/api/handlers/mesh/models"
 )
 
-// key consts
+// key constants
 const (
 	KEY_AGENT_KEY  = "poly:agent-key"
 	KEY_AGENT_KEYS = "poly:agent-keys"
 )
 
 type key struct {
-	UUID      string    `json:"id"`
 	Name      string    `json:"name"`
 	PublicKey string    `json:"public_key"`
 	ExpiresAt time.Time `json:"expires_at"`
@@ -26,7 +25,6 @@ type key struct {
 // FromModel converts model to presenter struct
 func (key) FromModel(m models.Key) key {
 	return key{
-		UUID:      m.UUID,
 		Name:      m.Name,
 		PublicKey: string(m.PublicKey),
 		ExpiresAt: m.ExpiresAt,
@@ -41,7 +39,7 @@ func Keys(keyModels []models.Key) Presentor {
 	a := key{}
 	u := ""
 	for _, m := range keyModels {
-		u += fmt.Sprintf("%s-%s-%s;", m.UUID, m.Name, m.UpdatedAt.String())
+		u += fmt.Sprintf("%s-%s;", m.Name, m.UpdatedAt.String())
 		p = append(p, a.FromModel(m))
 	}
 	return wrap(KEY_AGENT_KEYS, etag.Generate(u, true), p)
@@ -50,6 +48,6 @@ func Keys(keyModels []models.Key) Presentor {
 // Key presents an agent key
 func Key(m models.Key) Presentor {
 	a := key{}
-	u := fmt.Sprintf("%s-%s-%s;", m.UUID, m.Name, m.UpdatedAt.String())
+	u := fmt.Sprintf("%s-%s;", m.Name, m.UpdatedAt.String())
 	return wrap(KEY_AGENT_KEY, etag.Generate(u, true), a.FromModel(m))
 }

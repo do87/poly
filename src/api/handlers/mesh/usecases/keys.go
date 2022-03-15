@@ -11,11 +11,11 @@ import (
 
 // KeysRepository is the usecase repo for key keys
 type KeysRepository interface {
-	GetByName(ctx context.Context, name string) (models.Key, error)
+	Get(ctx context.Context, name string) (models.Key, error)
 	List(ctx context.Context) ([]models.Key, error)
 	Create(ctx context.Context, key models.Key) (models.Key, error)
 	FirstOrCreateGeneralKey(ctx context.Context, fallbackKey []byte) (models.Key, error)
-	Delete(ctx context.Context, id string) error
+	Delete(ctx context.Context, name string) error
 }
 
 // NewKeysUsecase creates a new Usecase service
@@ -46,8 +46,8 @@ func (u *keysUsecase) Create(ctx context.Context, r *http.Request) (key models.K
 }
 
 // Delete unregisters an key
-func (u *keysUsecase) Delete(ctx context.Context, r *http.Request, id string) (err error) {
-	return u.repo.Delete(ctx, id)
+func (u *keysUsecase) Delete(ctx context.Context, r *http.Request, name string) (err error) {
+	return u.repo.Delete(ctx, name)
 }
 
 // FirstOrCreateGeneralKey returns a general key

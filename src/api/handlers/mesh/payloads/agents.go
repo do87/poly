@@ -12,10 +12,10 @@ type AgentRegister struct {
 }
 
 // ToModel converts payload to model
-func (a *AgentRegister) ToModel(keyUUID string) models.Agent {
+func (a *AgentRegister) ToModel(name string) models.Agent {
 	return models.Agent{
 		UUID:     a.UUID,
-		KeyUUID:  keyUUID,
+		KeyName:  name,
 		Hostname: a.Hostname,
 		Labels:   a.Labels,
 		Plans:    a.Plans,

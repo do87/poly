@@ -6,7 +6,6 @@ import (
 
 // Key model
 type Key struct {
-	UUID      string
 	Name      string
 	PublicKey []byte
 	CreatedAt time.Time

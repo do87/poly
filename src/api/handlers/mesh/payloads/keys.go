@@ -4,7 +4,6 @@ import (
 	"time"
 
 	"github.com/do87/poly/src/api/handlers/mesh/models"
-	"github.com/docker/distribution/uuid"
 )
 
 // KeyCreate is the payload for creating agent key
@@ -20,7 +19,6 @@ func (k KeyCreate) ToModel() models.Key {
 		k.ExpiresAt = time.Now().Add(time.Hour * 24 * 365)
 	}
 	return models.Key{
-		UUID:      uuid.Generate().String(),
 		Name:      k.Name,
 		PublicKey: []byte(k.PublicKey),
 		ExpiresAt: k.ExpiresAt,
