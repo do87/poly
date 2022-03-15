@@ -6,7 +6,7 @@ import (
 
 // Key model
 type Key struct {
-	Name      string
+	Name      string `gorm:"primaryKey"`
 	PublicKey []byte
 	CreatedAt time.Time
 	UpdatedAt time.Time
