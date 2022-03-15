@@ -2,7 +2,9 @@ package common
 
 import (
 	"context"
+	"errors"
 	"net/http"
+	"time"
 
 	"github.com/do87/poly/src/api/handlers/mesh/models"
 	"github.com/do87/poly/src/api/handlers/mesh/payloads"
@@ -22,6 +24,9 @@ func AddToContext(r *http.Request, key MeshContextVar, value string) *http.Reque
 
 // ProcessRegisterKey processes a registration key using the provided public key
 func ProcessRegisterKey(key models.Key, payload payloads.AgentRegister) error {
+	if time.Now().After(key.ExpiresAt) {
+		return errors.New("given key has expired")
+	}
 	meshKey := auth.MeshRegisterKey{
 		Name:      key.Name,
 		PublicKey: key.PublicKey,
