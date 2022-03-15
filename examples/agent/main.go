@@ -12,11 +12,12 @@ func main() {
 
 	agent.New(agent.Config{
 		Labels: agent.Labels{
-			"infra": "prod",
+			"infra", "prod",
 		},
-		Key:  exampleKey,
-		Host: "localhost",
-	}).Register(
+		Key:       exampleKey,
+		AgentHost: "localhost",
+		MeshURL:   "127.0.0.1:8080",
+	}).Plans(
 		infra.Plan(),
 	).Run(ctx)
 }

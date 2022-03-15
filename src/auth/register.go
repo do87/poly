@@ -16,8 +16,8 @@ type AgentRegisterKey struct {
 	PrivateKey []byte // private key
 }
 
-// EncodeName encodes the key name using the private key
-func (k AgentRegisterKey) EncodeName(hostname string) (string, error) {
+// Encode encodes the key the private key and agent hostname
+func (k AgentRegisterKey) Encode(hostname string) (string, error) {
 	parsedKey, err := jwt.ParseRSAPrivateKeyFromPEM(k.PrivateKey)
 	if err != nil {
 		return "", err
