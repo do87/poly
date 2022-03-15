@@ -9,7 +9,7 @@ import (
 // Run model
 type Run struct {
 	UUID       string `gorm:"primaryKey"`
-	AgentUUID  string
+	Agent      string
 	Plan       string `gorm:"not null;default:null"`
 	Labels     pq.StringArray
 	Status     string
