@@ -16,6 +16,7 @@ func New(d *db.DB) *Repo {
 	if err := d.Migrate(
 		models.Agent{},
 		models.Key{},
+		models.Run{},
 	); err != nil {
 		panic(err)
 	}
