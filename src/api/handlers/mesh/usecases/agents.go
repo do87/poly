@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/do87/poly/src/api/handlers/mesh/common"
 	"github.com/do87/poly/src/api/handlers/mesh/models"
 	"github.com/do87/poly/src/api/handlers/mesh/payloads"
 )
@@ -44,7 +45,7 @@ func (u *agentsUsecase) Register(ctx context.Context, r *http.Request, keysUc *k
 	if err != nil {
 		return
 	}
-	if err = u.processKey(key, payload); err != nil {
+	if err = common.ProcessRegisterKey(key, payload); err != nil {
 		return
 	}
 	return u.repo.Register(ctx, payload.ToModel(key.UUID))

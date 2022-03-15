@@ -3,7 +3,7 @@ package middlewares
 import (
 	"net/http"
 
-	"github.com/do87/poly/src/api/handlers/mesh/ctx"
+	"github.com/do87/poly/src/api/handlers/mesh/common"
 	"github.com/do87/poly/src/auth"
 )
 
@@ -14,7 +14,7 @@ func VerifyAgent(next http.Handler) http.Handler {
 		if err != nil {
 			http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 		}
-		r = ctx.Add(r, ctx.CtxAgentHostname, hostname)
+		r = common.AddToContext(r, common.ContextAgentHostname, hostname)
 		next.ServeHTTP(w, r)
 	})
 }
