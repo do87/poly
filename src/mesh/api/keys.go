@@ -3,8 +3,8 @@ package mesh
 import (
 	"net/http"
 
-	"github.com/do87/poly/src/api/handlers/mesh/present"
-	"github.com/do87/poly/src/api/handlers/mesh/usecases"
+	"github.com/do87/poly/src/mesh/api/present"
+	"github.com/do87/poly/src/mesh/api/usecases"
 	"github.com/do87/poly/src/mesh/repos"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"

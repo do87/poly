@@ -1,7 +1,7 @@
 package mesh
 
 import (
-	"github.com/do87/poly/src/api/handlers/mesh/middlewares"
+	"github.com/do87/poly/src/mesh/api/middlewares"
 	"github.com/go-chi/chi/v5"
 )
 

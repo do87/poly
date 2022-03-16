@@ -2,8 +2,8 @@ package main
 
 import (
 	"github.com/do87/poly/src/api"
-	"github.com/do87/poly/src/api/handlers/health"
-	"github.com/do87/poly/src/api/handlers/mesh"
+	"github.com/do87/poly/src/health"
+	meshAPI "github.com/do87/poly/src/mesh/api"
 )
 
 func main() {
@@ -12,6 +12,6 @@ func main() {
 		DBConn:   "postgres://postgres:postgres@127.0.0.1:5432/poly?sslmode=disable",
 	}).Register(
 		health.Handler,
-		mesh.Handler,
+		meshAPI.Handler,
 	).Run()
 }
