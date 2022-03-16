@@ -53,5 +53,7 @@ func (u *agentsUsecase) Register(ctx context.Context, r *http.Request, keysUc *k
 
 // Deregister unregisters an agent
 func (u *agentsUsecase) Deregister(ctx context.Context, r *http.Request, id string) (models.Agent, error) {
+	// remove assignments for pending
+
 	return u.repo.Deregister(ctx, id)
 }
