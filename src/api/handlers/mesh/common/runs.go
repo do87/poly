@@ -18,8 +18,8 @@ const (
 	RUN_STATUS_SUCCESS  = "success"
 )
 
-// PropagateRunStatus modifies a given model according to the provided status
-func PropagateRunStatus(run *models.Run, status string) error {
+// SetRunStatus modifies a given model according to the provided status
+func SetRunStatus(run *models.Run, status string) error {
 	if err := validateRunStatus(status); err != nil {
 		return err
 	}

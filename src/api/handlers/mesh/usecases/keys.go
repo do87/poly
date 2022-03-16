@@ -9,7 +9,7 @@ import (
 	"github.com/do87/poly/src/api/handlers/mesh/payloads"
 )
 
-// KeysRepository is the usecase repo for key keys
+// KeysRepository is the usecase repo for agent keys
 type KeysRepository interface {
 	Get(ctx context.Context, name string) (models.Key, error)
 	List(ctx context.Context) ([]models.Key, error)

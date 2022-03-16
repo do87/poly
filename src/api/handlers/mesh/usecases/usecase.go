@@ -4,4 +4,5 @@ package usecases
 type Usecase struct {
 	Agents *agentsUsecase
 	Keys   *keysUsecase
+	Runs   *runsUsecase
 }
