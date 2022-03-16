@@ -38,3 +38,14 @@ func (k *runs) create(u *usecases.Usecase) http.HandlerFunc {
 		render.JSON(w, r, present.Run(data))
 	}
 }
+
+func (k *runs) update(u *usecases.Usecase) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		data, err := u.Runs.Update(r.Context(), r)
+		if err != nil {
+			render.JSON(w, r, present.Error(w, r, http.StatusInternalServerError, err))
+			return
+		}
+		render.JSON(w, r, present.Run(data))
+	}
+}
