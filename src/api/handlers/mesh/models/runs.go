@@ -13,8 +13,9 @@ type Run struct {
 	Plan       string `gorm:"not null;default:null"`
 	Labels     pq.StringArray
 	Status     string
-	StartedAt  time.Time
-	FinishedAt time.Time
+	AssignedAt time.Time `gorm:"default:null"`
+	StartedAt  time.Time `gorm:"default:null"`
+	FinishedAt time.Time `gorm:"default:null"`
 	CreatedAt  time.Time
 	UpdatedAt  time.Time
 }
