@@ -45,7 +45,7 @@ func (u *agentsUsecase) Register(ctx context.Context, r *http.Request, keysUc *k
 	if err != nil {
 		return
 	}
-	if err = common.ProcessRegisterKey(key, payload); err != nil {
+	if err = common.ProcessRegisterKey(key, payload.EncodedKey.Encoded, payload.Hostname); err != nil {
 		return
 	}
 	return u.repo.Register(ctx, payload.ToModel(key.Name))

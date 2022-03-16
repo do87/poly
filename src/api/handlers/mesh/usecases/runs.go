@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/do87/poly/src/api/handlers/mesh/common"
 	"github.com/do87/poly/src/api/handlers/mesh/models"
 	"github.com/do87/poly/src/api/handlers/mesh/payloads"
 )
@@ -36,15 +35,26 @@ func (u *runsUsecase) List(ctx context.Context, r *http.Request) ([]models.Run, 
 	return u.repo.List(ctx)
 }
 
-// Create registers an key and returns it
-func (u *runsUsecase) Create(ctx context.Context, r *http.Request) (key models.Run, err error) {
+// Create creates a new run
+func (u *runsUsecase) Create(ctx context.Context, r *http.Request) (run models.Run, err error) {
 	var payload payloads.RunCreate
 	if err = json.NewDecoder(r.Body).Decode(&payload); err != nil {
 		return
 	}
-	model := payload.ToModel()
-	if err = common.SetRunStatus(&model, common.RUN_STATUS_PENDING); err != nil {
+	if run, err = payload.ToModel(); err != nil {
 		return
 	}
-	return u.repo.Create(ctx, model)
+	return u.repo.Create(ctx, run)
+}
+
+// Update updates an existing run
+func (u *runsUsecase) Update(ctx context.Context, r *http.Request) (run models.Run, err error) {
+	var payload payloads.RunCreate
+	if err = json.NewDecoder(r.Body).Decode(&payload); err != nil {
+		return
+	}
+	if run, err = payload.ToModel(); err != nil {
+		return
+	}
+	return u.repo.Update(ctx, run)
 }
