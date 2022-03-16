@@ -11,14 +11,14 @@ The project consists of a mesh API which is the single source of truth, and agen
 ## Workflow
 
 <img src="statics/workflow.svg" alt="workflow" align="left">
-<div style="padding: 10px;">
+<span>
 
 1. The agent registers itself with the API and retrieves an access token
 2. The agent sends periodic liveness pings to the API
 3. The agent is polling for new runs to perform 
 
 * When an agent receives a shutdown signal, it makes an API call to deregister itself
-</div>
+</span>
 <br><br><br><br><br><br>
 
 ## Run Lifecycle
