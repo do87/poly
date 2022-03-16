@@ -6,10 +6,11 @@ import (
 	"github.com/do87/poly/src/mesh/models"
 )
 
-type RunsRepo repo
+// runsRepo is the repo for runs
+type runsRepo repo
 
 // Get returns run by uuid
-func (r *RunsRepo) Get(ctx context.Context, uuid string) (run models.Run, err error) {
+func (r *runsRepo) Get(ctx context.Context, uuid string) (run models.Run, err error) {
 	result := r.db.First(&run, "uuid = ?", uuid)
 	if result.Error != nil {
 		return models.Run{}, result.Error
@@ -18,7 +19,7 @@ func (r *RunsRepo) Get(ctx context.Context, uuid string) (run models.Run, err er
 }
 
 // List returns all runs
-func (r *RunsRepo) List(ctx context.Context) (keys []models.Run, err error) {
+func (r *runsRepo) List(ctx context.Context) (keys []models.Run, err error) {
 	result := r.db.Order("created_at DESC").Find(&keys)
 	if result.Error != nil {
 		return keys, result.Error
@@ -27,7 +28,7 @@ func (r *RunsRepo) List(ctx context.Context) (keys []models.Run, err error) {
 }
 
 // Pending returns all the runs with unassigned agent
-func (r *RunsRepo) Pending(ctx context.Context) (keys []models.Run, err error) {
+func (r *runsRepo) Pending(ctx context.Context) (keys []models.Run, err error) {
 	result := r.db.Where("agent = ''").Order("created_at DESC").Find(&keys)
 	if result.Error != nil {
 		return keys, result.Error
@@ -36,7 +37,7 @@ func (r *RunsRepo) Pending(ctx context.Context) (keys []models.Run, err error) {
 }
 
 // Create a new run
-func (r *RunsRepo) Create(ctx context.Context, run models.Run) (models.Run, error) {
+func (r *runsRepo) Create(ctx context.Context, run models.Run) (models.Run, error) {
 	if result := r.db.Create(&run); result.Error != nil {
 		return run, result.Error
 	}
@@ -44,7 +45,7 @@ func (r *RunsRepo) Create(ctx context.Context, run models.Run) (models.Run, erro
 }
 
 // Update updated a run by UUID
-func (r *RunsRepo) Update(ctx context.Context, run models.Run) (models.Run, error) {
+func (r *runsRepo) Update(ctx context.Context, run models.Run) (models.Run, error) {
 	m := &models.Run{}
 	if err := r.db.Model(m).Where("uuid = ?", run.UUID).Updates(run).Error; err != nil {
 		return run, err
