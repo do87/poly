@@ -21,14 +21,11 @@ The project consists of a mesh API which is the single source of truth, and agen
 
 ## Run Lifecycle
 
-When a run is created it's not assigned to any agent
+<img src="statics/lifecycle.svg" alt="lifecycle" align="left">
 
-When an agent is assigned to a run, the status changes to pending
+1. When a run is created it's not assigned to any agent
+2. When an agent is assigned to a run, the status changes to pending
+3. When an agent starts to execute a run plan, the status changes to running
+4. Success / Error are the usual outcomes of a run
+5. Cancelled status is given if the run didn't complete due to a shutdown signal
 
-When an agent starts to execute a run plan, the status changes to running
-
-Success / Error are the usual outcomes of a run
-
-Cancelled status is given if the run didn't complete due to a shutdown signal
-
-![workflow](statics/lifecycle.svg)
