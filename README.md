@@ -10,13 +10,11 @@ The project consists of a mesh API which is the single source of truth, and agen
 
 ## Workflow
 
-<img src="statics/workflow.svg" alt="workflow" style="float: left; margin-right: 30px;">
+| | |
+| --- | --- |
+| ![workflow](statics/workflow.svg) | 1. The agent registers itself with the API and retrieves an access token<br />2. The agent sends periodic liveness pings to the API<br />3. The agent is polling for new runs to perform |
 
-1. The agent registers itself with the API and retrieves an access token
-2. The agent sends periodic liveness pings to the API
-3. The agent is polling for new runs to perform
-
-<br style="clear:both"><br><br>
+<br><br><br>
 
 ## Run Lifecycle
 
