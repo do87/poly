@@ -4,7 +4,7 @@
 
 Poly is a project focused on implementing and managing agents that can run plans in various environments
 
-The project consists of a mesh API which is the single source of truth, and agents that can be extended and implemented according to the developer's needs.
+The project consists of a mesh server which is the single source of truth, and agents that can be extended and implemented according to the developer's needs.
 
 <br />
 
@@ -19,7 +19,17 @@ The project consists of a mesh API which is the single source of truth, and agen
 </span>
 <br><br><br><br><br><br>
 
-## Agent Runs
+## Mesh server
+
+Single source of truth for all agent's status, and runs at various stages
+
+The mesh server provides an API for the agents to interact with and retrieve runs they need to execute
+
+The server also comes with build in `routines`. As an example, a routine that assigns a run to an agent
+
+<br />
+
+## Agents
 
 Every agent has labels to identify it, and a list of plans it implements
 - A plan can be a piece of code for executing a terraform plan
