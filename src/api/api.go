@@ -24,41 +24,25 @@ type Config struct {
 
 // cleanup is a type of a function to defer
 type cleanup func() error
-type api struct {
-	router  *chi.Mux
-	db      *db.DB
-	log     *logger.Logger
-	config  Config
-	cleanup []cleanup
+type API struct {
+	router *chi.Mux
+	db     *db.DB
+	log    *logger.Logger
+	config Config
 }
 
 // New creates a new API
-func New(c Config) *api {
-	log, logsync := logger.New()
-	api := &api{
-		log:     log,
-		router:  newRouter(log),
-		config:  c,
-		cleanup: []cleanup{logsync},
+func New(log *logger.Logger, db *db.DB, c Config) *API {
+	return &API{
+		log:    log,
+		router: newRouter(log),
+		config: c,
+		db:     db,
 	}
-	api.setupDatabase()
-	return api
-}
-
-func (a *api) setupDatabase() {
-	if a.config.DBConn == "" {
-		return
-	}
-	db, err := db.NewPostgres(a.config.DBConn)
-	if err != nil {
-		panic(err)
-	}
-	a.db = db
-	a.cleanup = append(a.cleanup, db.Close)
 }
 
 // Register registers the API
-func (a *api) Register(handlers ...Handler) *api {
+func (a *API) Register(handlers ...Handler) *API {
 	for _, handler := range handlers {
 		handler(a.router, a.db)
 	}
@@ -66,22 +50,14 @@ func (a *api) Register(handlers ...Handler) *api {
 }
 
 // Run runs the API
-func (a *api) Run() {
-	defer a.Cleanup()
+func (a *API) Run() {
 	a.log.Info("running server...", "host", a.serverStr())
 	if err := http.ListenAndServe(a.serverStr(), a.router); err != nil {
 		panic(err)
 	}
 }
 
-// Cleanup run cleanup functions
-func (a *api) Cleanup() {
-	for _, c := range a.cleanup {
-		c()
-	}
-}
-
-func (a *api) serverStr() string {
+func (a *API) serverStr() string {
 	addr := a.config.BindAddr
 	if addr == "" {
 		addr = "0.0.0.0"

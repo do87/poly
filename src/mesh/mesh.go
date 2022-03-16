@@ -1,0 +1,75 @@
+package mesh
+
+import (
+	"github.com/do87/poly/src/api"
+	"github.com/do87/poly/src/db"
+	"github.com/do87/poly/src/health"
+	"github.com/do87/poly/src/logger"
+	meshAPI "github.com/do87/poly/src/mesh/api"
+)
+
+type mesh struct {
+	config  Config
+	log     *logger.Logger
+	db      *db.DB
+	cleanup []cleanup
+	api     *api.API
+}
+
+type APIConfig = api.Config
+
+// Config is the mesh server config
+type Config struct {
+	API    APIConfig
+	DBConn string
+}
+
+// cleanup is a type of a function to defer
+type cleanup func() error
+
+// New creates a new API
+func New(c Config) *mesh {
+	log, logsync := logger.New()
+	m := &mesh{
+		log:     log,
+		cleanup: []cleanup{logsync},
+		db:      setupDatabase(c),
+	}
+	m.api = api.New(log, m.db, c.API)
+	m.cleanup = append(m.cleanup, m.db.Close)
+	m.Register(
+		health.Handler,
+		meshAPI.Handler,
+	)
+	return m
+}
+
+func setupDatabase(c Config) *db.DB {
+	if c.DBConn == "" {
+		return nil
+	}
+	db, err := db.NewPostgres(c.DBConn)
+	if err != nil {
+		panic(err)
+	}
+	return db
+}
+
+// Register registers APIs
+func (m *mesh) Register(handlers ...api.Handler) *mesh {
+	m.api.Register(handlers...)
+	return m
+}
+
+// Run runs the API
+func (m *mesh) Run() {
+	defer m.Cleanup()
+	m.api.Run()
+}
+
+// Cleanup runs cleanup functions
+func (m *mesh) Cleanup() {
+	for _, c := range m.cleanup {
+		c()
+	}
+}
