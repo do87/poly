@@ -8,6 +8,7 @@ func main() {
 	mesh.New(mesh.Config{
 		API: mesh.APIConfig{
 			BindAddr: "127.0.0.1",
+			BindPort: 8080,
 		},
 		DBConn: "postgres://postgres:postgres@127.0.0.1:5432/poly?sslmode=disable",
 	}).Run()

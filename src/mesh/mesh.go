@@ -16,6 +16,7 @@ type mesh struct {
 	api     *api.API
 }
 
+// APIConfig mirrors the API config
 type APIConfig = api.Config
 
 // Config is the mesh server config
@@ -27,7 +28,7 @@ type Config struct {
 // cleanup is a type of a function to defer
 type cleanup func() error
 
-// New creates a new API
+// New creates a new mesh server
 func New(c Config) *mesh {
 	log, logsync := logger.New()
 	m := &mesh{
@@ -61,7 +62,7 @@ func (m *mesh) Register(handlers ...api.Handler) *mesh {
 	return m
 }
 
-// Run runs the API
+// Run runs the mesh server
 func (m *mesh) Run() {
 	defer m.Cleanup()
 	m.api.Run()

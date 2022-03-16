@@ -19,11 +19,12 @@ type Handler func(*chi.Mux, *db.DB)
 type Config struct {
 	BindAddr string
 	BindPort int
-	DBConn   string
 }
 
 // cleanup is a type of a function to defer
 type cleanup func() error
+
+// API is the API service
 type API struct {
 	router *chi.Mux
 	db     *db.DB
