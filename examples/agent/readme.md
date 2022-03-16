@@ -6,7 +6,7 @@ the private key `keys/private_key.pem` is used to register the agent with the Me
 
 <br />
 
-## Adding the public key to the Mesh server
+## Setting keys in the Mesh server
 
 The public key needs to be added to the server first before it can be used
 
