@@ -1,8 +1,8 @@
 package repos
 
 import (
-	"github.com/do87/poly/src/api/handlers/mesh/models"
 	"github.com/do87/poly/src/db"
+	"github.com/do87/poly/src/mesh/models"
 	"gorm.io/gorm"
 )
 

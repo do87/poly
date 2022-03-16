@@ -1,8 +1,8 @@
 package payloads
 
 import (
-	"github.com/do87/poly/src/api/handlers/mesh/common"
-	"github.com/do87/poly/src/api/handlers/mesh/models"
+	"github.com/do87/poly/src/mesh/common"
+	"github.com/do87/poly/src/mesh/models"
 )
 
 // RunCreate is the payload needed to create an agent run

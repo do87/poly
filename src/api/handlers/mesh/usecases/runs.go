@@ -5,8 +5,8 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/do87/poly/src/api/handlers/mesh/models"
 	"github.com/do87/poly/src/api/handlers/mesh/payloads"
+	"github.com/do87/poly/src/mesh/models"
 )
 
 // RunsRepository is the usecase repo for agent runs

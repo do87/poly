@@ -3,8 +3,8 @@ package middlewares
 import (
 	"net/http"
 
-	"github.com/do87/poly/src/api/handlers/mesh/common"
 	"github.com/do87/poly/src/auth"
+	"github.com/do87/poly/src/mesh/common"
 )
 
 // VerifyAgent is a middleware to verify an agent's access token

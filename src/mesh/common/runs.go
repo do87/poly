@@ -4,7 +4,7 @@ import (
 	"errors"
 	"time"
 
-	"github.com/do87/poly/src/api/handlers/mesh/models"
+	"github.com/do87/poly/src/mesh/models"
 	"github.com/docker/distribution/uuid"
 )
 
