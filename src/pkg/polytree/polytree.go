@@ -7,7 +7,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/do87/poly/src/logger"
+	"github.com/do87/poly/src/pkg/logger"
 )
 
 // Tree is the polytree handler

@@ -3,10 +3,10 @@ package mesh
 import (
 	"context"
 
-	"github.com/do87/poly/src/auth"
-	"github.com/do87/poly/src/db"
 	"github.com/do87/poly/src/mesh/api/usecases"
 	"github.com/do87/poly/src/mesh/repos"
+	"github.com/do87/poly/src/pkg/auth"
+	"github.com/do87/poly/src/pkg/db"
 	"github.com/go-chi/chi/v5"
 )
 

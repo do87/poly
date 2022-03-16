@@ -4,8 +4,8 @@ import (
 	"errors"
 	"time"
 
-	"github.com/do87/poly/src/auth"
 	"github.com/do87/poly/src/mesh/models"
+	"github.com/do87/poly/src/pkg/auth"
 )
 
 // ProcessRegisterKey processes a registration key using the provided public key

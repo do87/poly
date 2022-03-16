@@ -5,8 +5,8 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/do87/poly/src/db"
-	"github.com/do87/poly/src/logger"
+	"github.com/do87/poly/src/pkg/db"
+	"github.com/do87/poly/src/pkg/logger"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/render"

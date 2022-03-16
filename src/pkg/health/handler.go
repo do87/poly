@@ -1,7 +1,7 @@
 package health
 
 import (
-	"github.com/do87/poly/src/db"
+	"github.com/do87/poly/src/pkg/db"
 	"github.com/go-chi/chi/v5"
 )
 

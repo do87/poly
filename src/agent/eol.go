@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/do87/poly/src/logger"
+	"github.com/do87/poly/src/pkg/logger"
 )
 
 // eol handles agent end of life

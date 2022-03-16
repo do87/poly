@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/do87/poly/src/agent"
-	"github.com/do87/poly/src/logger"
+	"github.com/do87/poly/src/pkg/logger"
 )
 
 type infra struct{}

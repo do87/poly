@@ -5,7 +5,7 @@ import (
 
 	"github.com/do87/poly/example/agent/plans/infra"
 	"github.com/do87/poly/src/agent"
-	"github.com/do87/poly/src/auth"
+	"github.com/do87/poly/src/pkg/auth"
 )
 
 func main() {

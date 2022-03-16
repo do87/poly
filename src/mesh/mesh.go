@@ -1,11 +1,11 @@
 package mesh
 
 import (
-	"github.com/do87/poly/src/api"
-	"github.com/do87/poly/src/db"
-	"github.com/do87/poly/src/health"
-	"github.com/do87/poly/src/logger"
 	meshAPI "github.com/do87/poly/src/mesh/api"
+	"github.com/do87/poly/src/pkg/api"
+	"github.com/do87/poly/src/pkg/db"
+	"github.com/do87/poly/src/pkg/health"
+	"github.com/do87/poly/src/pkg/logger"
 )
 
 type mesh struct {

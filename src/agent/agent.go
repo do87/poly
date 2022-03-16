@@ -12,12 +12,12 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/do87/poly/src/auth"
-	"github.com/do87/poly/src/client"
-	"github.com/do87/poly/src/logger"
 	"github.com/do87/poly/src/mesh/api/payloads"
 	"github.com/do87/poly/src/mesh/api/present"
-	"github.com/do87/poly/src/polytree"
+	"github.com/do87/poly/src/pkg/auth"
+	"github.com/do87/poly/src/pkg/client"
+	"github.com/do87/poly/src/pkg/logger"
+	"github.com/do87/poly/src/pkg/polytree"
 	"github.com/docker/distribution/uuid"
 )
 
