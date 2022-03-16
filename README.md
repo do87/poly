@@ -19,7 +19,14 @@ The project consists of a mesh API which is the single source of truth, and agen
 </span>
 <br><br><br><br><br><br>
 
-## Run Lifecycle
+## Agent Runs
+
+Every agent has a set of plans it implements, and labels to identify it
+- A plan could be a piece of code for executing a terraform plan
+- Agents that implement the same plans can run with different labels. A label could be `prod` or `dev` for example
+
+When there's a run request, it specifies which plan should run (by the plan's key) and the labels to decide which agents can execute the run
+### Lifecycle
 
 <img src="statics/lifecycle.svg" alt="lifecycle" align="right">
 
