@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/do87/poly/src/api/handlers/mesh/present"
+	"github.com/do87/poly/src/api/handlers/mesh/repos"
 	"github.com/do87/poly/src/api/handlers/mesh/usecases"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
@@ -11,6 +12,12 @@ import (
 
 type keys struct {
 	uc *usecases.Usecase
+}
+
+func newKeysHandler(repo *repos.Repo) *keys {
+	return &keys{
+		uc: usecases.NewKeysUsecase(repo.Keys),
+	}
 }
 
 func (k *keys) list(u *usecases.Usecase) http.HandlerFunc {

@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/do87/poly/src/api/handlers/mesh/present"
+	"github.com/do87/poly/src/api/handlers/mesh/repos"
 	"github.com/do87/poly/src/api/handlers/mesh/usecases"
 	"github.com/do87/poly/src/auth"
 	"github.com/go-chi/chi/v5"
@@ -13,6 +14,13 @@ import (
 type agents struct {
 	uc   *usecases.Usecase
 	auth *auth.General
+}
+
+func newAgentHandler(repo *repos.Repo, general *auth.General) *agents {
+	return &agents{
+		uc:   usecases.NewAgentsUsecase(repo.Agents),
+		auth: general,
+	}
 }
 
 func (a *agents) list(u *usecases.Usecase) http.HandlerFunc {
