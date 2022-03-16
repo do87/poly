@@ -5,7 +5,7 @@ import (
 	"net/http"
 )
 
-// MeshContextType is context keys type for mesh API
+// MeshContextVar is context keys type for mesh API
 type MeshContextVar string
 
 // ContextAgentHostname is the key that will be added to the context

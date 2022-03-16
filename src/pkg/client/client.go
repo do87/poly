@@ -12,6 +12,7 @@ import (
 	"path"
 )
 
+// Client is the HTTP client service for poly mesh API
 type Client struct {
 	client  *http.Client
 	baseURL string
@@ -31,6 +32,7 @@ func (c *Client) SetToken(bearer string) {
 	c.token = bearer
 }
 
+// Do prepares the body and runs the request
 func (c *Client) Do(ctx context.Context, method, path string, body interface{}) ([]byte, error) {
 	b, err := c.prepareBody(body)
 	if err != nil {
