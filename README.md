@@ -10,7 +10,7 @@ The project consists of a mesh server which is the single source of truth, and a
 
 ## Workflow
 
-<img src="statics/workflow.svg" alt="workflow" align="left">
+<img src="statics/workflow.png" alt="workflow" align="left">
 <span>
 
 1. The agent registers itself with the API and retrieves an access token
