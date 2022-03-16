@@ -25,14 +25,13 @@ func (a *RunCreate) ToModel() (m models.Run, err error) {
 
 // RunUpdate is the payload needed to update an agent run
 type RunUpdate struct {
-	UUID   string `json:"id"`
 	Status string `json:"status"`
 }
 
 // ToModel converts payload to model
-func (a *RunUpdate) ToModel() (m models.Run, err error) {
+func (a *RunUpdate) ToModel(uuid string) (m models.Run, err error) {
 	m = models.Run{
-		UUID: a.UUID,
+		UUID: uuid,
 	}
 	err = common.SetRunStatus(&m, a.Status)
 	return

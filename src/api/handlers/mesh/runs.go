@@ -6,6 +6,7 @@ import (
 	"github.com/do87/poly/src/api/handlers/mesh/present"
 	"github.com/do87/poly/src/api/handlers/mesh/repos"
 	"github.com/do87/poly/src/api/handlers/mesh/usecases"
+	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
 )
 
@@ -41,7 +42,8 @@ func (k *runs) create(u *usecases.Usecase) http.HandlerFunc {
 
 func (k *runs) update(u *usecases.Usecase) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		data, err := u.Runs.Update(r.Context(), r)
+		id := chi.URLParam(r, "id")
+		data, err := u.Runs.Update(r.Context(), r, id)
 		if err != nil {
 			render.JSON(w, r, present.Error(w, r, http.StatusInternalServerError, err))
 			return

@@ -48,12 +48,12 @@ func (u *runsUsecase) Create(ctx context.Context, r *http.Request) (run models.R
 }
 
 // Update updates an existing run
-func (u *runsUsecase) Update(ctx context.Context, r *http.Request) (run models.Run, err error) {
-	var payload payloads.RunCreate
+func (u *runsUsecase) Update(ctx context.Context, r *http.Request, uuid string) (run models.Run, err error) {
+	var payload payloads.RunUpdate
 	if err = json.NewDecoder(r.Body).Decode(&payload); err != nil {
 		return
 	}
-	if run, err = payload.ToModel(); err != nil {
+	if run, err = payload.ToModel(uuid); err != nil {
 		return
 	}
 	return u.repo.Update(ctx, run)
