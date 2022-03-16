@@ -17,7 +17,7 @@ The project consists of a mesh API which is the single source of truth, and agen
 2. The agent is polling the API periodically, and the API returns a list of runs it needs to execute
 3. When an agent receives a shutdown signal, it makes an API call to deregister itself
 </span>
-<br><br><br><br><br><br><br><br>
+<br><br><br><br><br><br>
 
 ## Run Lifecycle
 
