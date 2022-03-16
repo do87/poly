@@ -2,6 +2,7 @@ package mesh
 
 import (
 	meshAPI "github.com/do87/poly/src/mesh/api"
+	"github.com/do87/poly/src/mesh/routines"
 	"github.com/do87/poly/src/pkg/api"
 	"github.com/do87/poly/src/pkg/db"
 	"github.com/do87/poly/src/pkg/health"
@@ -65,6 +66,7 @@ func (m *mesh) Register(handlers ...api.Handler) *mesh {
 // Run runs the mesh server
 func (m *mesh) Run() {
 	defer m.Cleanup()
+	go routines.Run()
 	m.api.Run()
 }
 
