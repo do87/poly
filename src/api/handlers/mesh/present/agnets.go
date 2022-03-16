@@ -36,23 +36,23 @@ func (agent) FromModel(m models.Agent) agent {
 	}
 }
 
+var _a = agent{}
+
 // Agents presents agents
 func Agents(agentModels []models.Agent) Presentor {
 	p := make([]agent, 0)
-	a := agent{}
 	u := ""
 	for _, m := range agentModels {
 		u += fmt.Sprintf("%s-%s-%s;", m.UUID, m.Hostname, m.UpdatedAt.String())
-		p = append(p, a.FromModel(m))
+		p = append(p, _a.FromModel(m))
 	}
 	return wrap(KEY_AGENTS, etag.Generate(u, true), p)
 }
 
 // Agent presents agent
 func Agent(m models.Agent) Presentor {
-	a := agent{}
 	u := fmt.Sprintf("%s-%s-%s;", m.UUID, m.Hostname, m.UpdatedAt.String())
-	return wrap(KEY_AGENTS, etag.Generate(u, true), a.FromModel(m))
+	return wrap(KEY_AGENTS, etag.Generate(u, true), _a.FromModel(m))
 }
 
 // AccessToken presents agent's access token

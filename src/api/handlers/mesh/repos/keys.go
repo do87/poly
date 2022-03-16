@@ -4,12 +4,9 @@ import (
 	"context"
 
 	"github.com/do87/poly/src/api/handlers/mesh/models"
-	"gorm.io/gorm"
 )
 
-type keysRepo struct {
-	db *gorm.DB
-}
+type keysRepo repo
 
 // Get returns key by name
 func (r *keysRepo) Get(ctx context.Context, name string) (key models.Key, err error) {

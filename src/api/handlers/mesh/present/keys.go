@@ -33,21 +33,21 @@ func (key) FromModel(m models.Key) key {
 	}
 }
 
+var _k = key{}
+
 // Keys presents agent keys
 func Keys(keyModels []models.Key) Presentor {
 	p := make([]key, 0)
-	a := key{}
 	u := ""
 	for _, m := range keyModels {
 		u += fmt.Sprintf("%s-%s;", m.Name, m.UpdatedAt.String())
-		p = append(p, a.FromModel(m))
+		p = append(p, _k.FromModel(m))
 	}
 	return wrap(KEY_AGENT_KEYS, etag.Generate(u, true), p)
 }
 
 // Key presents an agent key
 func Key(m models.Key) Presentor {
-	a := key{}
 	u := fmt.Sprintf("%s-%s;", m.Name, m.UpdatedAt.String())
-	return wrap(KEY_AGENT_KEY, etag.Generate(u, true), a.FromModel(m))
+	return wrap(KEY_AGENT_KEY, etag.Generate(u, true), _k.FromModel(m))
 }

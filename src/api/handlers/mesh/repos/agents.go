@@ -4,12 +4,9 @@ import (
 	"context"
 
 	"github.com/do87/poly/src/api/handlers/mesh/models"
-	"gorm.io/gorm"
 )
 
-type agentsRepo struct {
-	db *gorm.DB
-}
+type agentsRepo repo
 
 // Get returns agent by UUID
 func (r *agentsRepo) Get(ctx context.Context, id string) (agents models.Agent, err error) {

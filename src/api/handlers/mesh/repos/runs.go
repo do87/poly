@@ -4,12 +4,9 @@ import (
 	"context"
 
 	"github.com/do87/poly/src/api/handlers/mesh/models"
-	"gorm.io/gorm"
 )
 
-type RunsRepo struct {
-	db *gorm.DB
-}
+type RunsRepo repo
 
 // Get returns run by uuid
 func (r *RunsRepo) Get(ctx context.Context, uuid string) (run models.Run, err error) {

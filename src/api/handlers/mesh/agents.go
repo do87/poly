@@ -12,15 +12,16 @@ import (
 )
 
 type agents struct {
-	uc   *usecases.Usecase
+	subHandler
 	auth *auth.General
 }
 
 func newAgentHandler(repo *repos.Repo, general *auth.General) *agents {
-	return &agents{
-		uc:   usecases.NewAgentsUsecase(repo.Agents),
+	a := &agents{
 		auth: general,
 	}
+	a.uc = usecases.NewAgentsUsecase(repo.Agents)
+	return a
 }
 
 func (a *agents) list(u *usecases.Usecase) http.HandlerFunc {

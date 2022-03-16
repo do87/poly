@@ -10,9 +10,7 @@ import (
 	"github.com/go-chi/render"
 )
 
-type keys struct {
-	uc *usecases.Usecase
-}
+type keys subHandler
 
 func newKeysHandler(repo *repos.Repo) *keys {
 	return &keys{

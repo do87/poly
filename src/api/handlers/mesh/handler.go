@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/do87/poly/src/api/handlers/mesh/repos"
+	"github.com/do87/poly/src/api/handlers/mesh/usecases"
 	"github.com/do87/poly/src/auth"
 	"github.com/do87/poly/src/db"
 	"github.com/go-chi/chi/v5"
@@ -17,6 +18,11 @@ type handler struct {
 	// sub handlers:
 	agents *agents
 	keys   *keys
+	runs   *runs
+}
+
+type subHandler struct {
+	uc *usecases.Usecase
 }
 
 // Handler handles agent related routes and functionality
@@ -31,6 +37,7 @@ func Handler(r *chi.Mux, d *db.DB) {
 		// sub handlers:
 		agents: newAgentHandler(repo, general),
 		keys:   newKeysHandler(repo),
+		runs:   newRunsHandler(repo),
 	}
 	p.handleAuth().setRoutes()
 }
