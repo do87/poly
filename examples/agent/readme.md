@@ -2,19 +2,23 @@
 
 This code represents a minimal Poly agent
 
-the private key (keys/private_key.pem) is used to register the agent with the Mesh server
+the private key `keys/private_key.pem` is used to register the agent with the Mesh server
+
+<br />
 
 ## Adding the public key to the Mesh server
 
 The public key needs to be added to the server first before it can be used
 
-use the `/agents/key` endpoint with the following request body:
+use the `{{mesh-server}}/agents/key` endpoint with the following request body:
 
     {
         "name": "pubkey:v0.1",
         "public_key": "...",
         "expires_at": "2023-03-01T23:00:00+00:00"
     }
+
+<br />
 
 ## Generating keys
 
