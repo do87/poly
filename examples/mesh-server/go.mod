@@ -1,6 +1,6 @@
 module github.com/do87/poly/example/mesh
 
-go 1.17
+go 1.18
 
 replace github.com/do87/poly/src => ../../src
 
