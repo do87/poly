@@ -19,7 +19,7 @@ func (a *RunCreate) ToModel() (m models.Run, err error) {
 		Labels: a.Labels,
 		Plan:   a.Plan,
 	}
-	err = common.SetRunStatus(&m, common.RUN_STATUS_PENDING)
+	err = common.SetRunStatus(&m, common.RUN_STATUS_CREATED)
 	return
 }
 

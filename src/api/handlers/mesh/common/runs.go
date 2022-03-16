@@ -10,12 +10,12 @@ import (
 
 // Run status related costs
 const (
-	RUN_STATUS_ASSIGNED = "assigned"
-	RUN_STATUS_CANCELED = "canceled"
-	RUN_STATUS_ERROR    = "error"
+	RUN_STATUS_CREATED  = "created"
 	RUN_STATUS_PENDING  = "pending"
 	RUN_STATUS_RUNNING  = "running"
 	RUN_STATUS_SUCCESS  = "success"
+	RUN_STATUS_ERROR    = "error"
+	RUN_STATUS_CANCELED = "canceled"
 )
 
 // SetRunStatus modifies a given model according to the provided status
@@ -25,10 +25,10 @@ func SetRunStatus(run *models.Run, status string) error {
 	}
 	run.Status = status
 	switch status {
+	case RUN_STATUS_CREATED:
+		handleRunStatusCreated(run)
 	case RUN_STATUS_PENDING:
 		handleRunStatusPending(run)
-	case RUN_STATUS_ASSIGNED:
-		handleRunStatusAssigned(run)
 	case RUN_STATUS_RUNNING:
 		handleRunStatusRunning(run)
 	case RUN_STATUS_CANCELED:
@@ -41,12 +41,12 @@ func SetRunStatus(run *models.Run, status string) error {
 	return nil
 }
 
-func handleRunStatusPending(run *models.Run) {
+func handleRunStatusCreated(run *models.Run) {
 	run.UUID = uuid.Generate().String()
 	run.CreatedAt = time.Now()
 }
 
-func handleRunStatusAssigned(run *models.Run) {
+func handleRunStatusPending(run *models.Run) {
 	run.AssignedAt = time.Now()
 }
 
@@ -60,9 +60,9 @@ func handleRunStatusDone(run *models.Run) {
 
 func validateRunStatus(status string) error {
 	switch status {
-	case RUN_STATUS_ASSIGNED:
-		fallthrough
 	case RUN_STATUS_CANCELED:
+		fallthrough
+	case RUN_STATUS_CREATED:
 		fallthrough
 	case RUN_STATUS_ERROR:
 		fallthrough
