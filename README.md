@@ -21,7 +21,7 @@ The project consists of a mesh API which is the single source of truth, and agen
 
 ## Agent Runs
 
-Every agent has a set of plans it implements, and labels to identify it
+Every agent has labels to identify it, and a list of plans it implements
 - A plan could be a piece of code for executing a terraform plan
 - Agents that implement the same plans can run with different labels. A label could be `prod` or `dev` for example
 
