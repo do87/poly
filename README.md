@@ -23,7 +23,7 @@ The project consists of a mesh server which is the single source of truth, and a
 
 The mesh server provides an API for the agents to interact with and retrieve runs they need to execute
 
-The server also comes with build in `routines`. As an example, a routine that assigns a run to an agent
+The server also comes with built in `routines`. As an example, a routine that assigns a run to an agent
 
 <br />
 
