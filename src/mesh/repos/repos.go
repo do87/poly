@@ -10,7 +10,7 @@ import (
 type Repo struct {
 	Agents *agentsRepo
 	Keys   *keysRepo
-	Runs   *RunsRepo
+	Runs   *runsRepo
 }
 
 type repo struct {
@@ -33,7 +33,7 @@ func New(d *db.DB) *Repo {
 		Keys: &keysRepo{
 			db: d.GetDB(),
 		},
-		Runs: &RunsRepo{
+		Runs: &runsRepo{
 			db: d.GetDB(),
 		},
 	}

@@ -6,6 +6,7 @@ import (
 	"github.com/do87/poly/src/mesh/models"
 )
 
+// keysRepo is the repo for keys
 type keysRepo repo
 
 // Get returns key by name
