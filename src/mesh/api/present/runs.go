@@ -20,6 +20,7 @@ type run struct {
 	Plan       string    `json:"plan"`
 	Labels     []string  `json:"labels"`
 	Status     string    `json:"status"`
+	Payload    string    `json:"payload"`
 	AssignedAt time.Time `json:"assigned_at"`
 	StartedAt  time.Time `json:"started_at"`
 	FinishedAt time.Time `json:"finished_at"`
@@ -34,6 +35,7 @@ func (run) FromModel(m models.Run) run {
 		Agent:      m.Agent,
 		Plan:       m.Plan,
 		Labels:     m.Labels,
+		Payload:    string(m.Payload),
 		Status:     m.Status,
 		AssignedAt: m.AssignedAt,
 		StartedAt:  m.StartedAt,

@@ -12,6 +12,7 @@ type Run struct {
 	Agent      string
 	Plan       string `gorm:"not null;default:null"`
 	Labels     pq.StringArray
+	Payload    []byte `gorm:"default:null"`
 	Status     string
 	AssignedAt time.Time `gorm:"default:null"`
 	StartedAt  time.Time `gorm:"default:null"`

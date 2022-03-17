@@ -20,8 +20,8 @@ func (h *handler) setRoutes() *handler {
 		r.Use(middlewares.VerifyAgent)
 
 		// agents lifecycle
-		h.route.Get("/agent/{id}/runs", h.runs.listPending(h.runs.uc))  // Deregisters an agent by ID
-		h.route.Delete("/agent/{id}", h.agents.deregister(h.agents.uc)) // Deregisters an agent by ID
+		h.route.Get("/agent/{id}/runs/pending", h.runs.listPending(h.runs.uc)) // List pending runs
+		h.route.Delete("/agent/{id}", h.agents.deregister(h.agents.uc))        // Deregisters an agent by ID
 
 		// runs lifecycle
 		h.route.Get("/runs", h.runs.list(h.runs.uc))

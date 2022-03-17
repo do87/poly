@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 	"os"
 	"os/signal"
@@ -14,6 +15,7 @@ import (
 
 	"github.com/do87/poly/src/mesh/api/payloads"
 	"github.com/do87/poly/src/mesh/api/present"
+	"github.com/do87/poly/src/mesh/models"
 	"github.com/do87/poly/src/pkg/auth"
 	"github.com/do87/poly/src/pkg/client"
 	"github.com/do87/poly/src/pkg/logger"
@@ -217,13 +219,33 @@ type request struct {
 
 // poll checks api for new plan requests
 func (a *agent) poll(ctx context.Context, log *logger.Logger) {
-	request := &request{
-		ID:      "1",
-		Plan:    "plan:infra:v1",
-		Payload: []byte(`{"env": "dev"}`),
+	bRuns, err := a.client.Do(ctx, http.MethodGet, fmt.Sprintf("/agent/%s/runs/pending", a.uuid), nil)
+	if err != nil {
+		log.Error(err.Error())
+		return
+	}
+	var p present.Presentor
+	if err := json.Unmarshal(bRuns, &p); err != nil {
+		log.Error(err.Error())
+		return
 	}
 
-	a.processRequest(ctx, log, request)
+	runs, ok := p.Data.([]models.Run)
+	if !ok {
+		log.Error("couldn't parse presentor data")
+		return
+	}
+
+	for _, run := range runs {
+
+		request := &request{
+			ID:      run.UUID,
+			Plan:    run.Plan,
+			Payload: run.Payload,
+		}
+
+		a.processRequest(ctx, log, request)
+	}
 }
 
 // processRequest find plan keys that match the request

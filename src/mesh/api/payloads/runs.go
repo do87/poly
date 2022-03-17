@@ -7,17 +7,19 @@ import (
 
 // RunCreate is the payload needed to create an agent run
 type RunCreate struct {
-	UUID   string   `json:"id"`
-	Labels []string `json:"labels"`
-	Plan   string   `json:"plan"`
+	UUID    string   `json:"id"`
+	Labels  []string `json:"labels"`
+	Plan    string   `json:"plan"`
+	Payload []byte   `json:"payload"`
 }
 
 // ToModel converts payload to model
 func (a *RunCreate) ToModel() (m models.Run, err error) {
 	m = models.Run{
-		UUID:   a.UUID,
-		Labels: a.Labels,
-		Plan:   a.Plan,
+		UUID:    a.UUID,
+		Labels:  a.Labels,
+		Plan:    a.Plan,
+		Payload: a.Payload,
 	}
 	err = common.SetRunStatus(&m, common.RUN_STATUS_CREATED)
 	return
