@@ -108,11 +108,38 @@ func filterCandidates(candidates map[string][]string) map[string][]string {
 	return candidates
 }
 
-// FindInactiveAgents checks for agents that didn't make liveness calls > 10 minutes
-// and marks them as inactive
-func FindInactiveAgents(ctx context.Context, log *logger.Logger, r *repos.Repo) {
-}
-
 // CancelRunsForInactiveAgents If an agent is marked as inactive but has a running job it needs to be marked as cancelled
 func CancelRunsForInactiveAgents(ctx context.Context, log *logger.Logger, r *repos.Repo) {
+	runs, err := r.Runs.ListPendingSince(ctx, time.Now().Add(time.Minute*time.Duration(-10)))
+	if err != nil {
+		log.Error(err.Error())
+		return
+	}
+
+	runsToCancel := findRunsToCancel(ctx, log, r, runs)
+	for _, run := range runsToCancel {
+		if err := updateRun(ctx, r, run, common.RUN_STATUS_CANCELED); err != nil {
+			log.Error(err.Error())
+		}
+	}
+}
+
+func findRunsToCancel(ctx context.Context, log *logger.Logger, r *repos.Repo, runs []models.Run) []models.Run {
+	toCancel := []models.Run{}
+	for _, run := range runs {
+		if run.Agent == "" {
+			log.Warning("found a run in pending state with no agent uuid", "run", run.UUID)
+			toCancel = append(toCancel, run)
+			continue
+		}
+		a, err := r.Agents.Get(ctx, run.Agent)
+		if err != nil {
+			log.Error(err.Error())
+			continue
+		}
+		if !a.Active {
+			toCancel = append(toCancel, run)
+		}
+	}
+	return toCancel
 }

@@ -2,6 +2,7 @@ package repos
 
 import (
 	"context"
+	"time"
 
 	"github.com/do87/poly/src/mesh/common"
 	"github.com/do87/poly/src/mesh/models"
@@ -31,6 +32,18 @@ func (r *runsRepo) List(ctx context.Context) (keys []models.Run, err error) {
 // ListCreated returns all new runs with unassigned agent
 func (r *runsRepo) ListCreated(ctx context.Context) (keys []models.Run, err error) {
 	result := r.db.Where("status = ?", common.RUN_STATUS_CREATED).Order("created_at DESC").Find(&keys)
+	if result.Error != nil {
+		return keys, result.Error
+	}
+	return keys, nil
+}
+
+// ListPendingSince returns all runs in pending state since given time
+func (r *runsRepo) ListPendingSince(ctx context.Context, t time.Time) (keys []models.Run, err error) {
+	result := r.db.
+		Where("status = ?", common.RUN_STATUS_PENDING).
+		Where("assigned_at > ?", t).
+		Order("created_at DESC").Find(&keys)
 	if result.Error != nil {
 		return keys, result.Error
 	}

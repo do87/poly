@@ -2,6 +2,7 @@ package repos
 
 import (
 	"context"
+	"time"
 
 	"github.com/do87/poly/src/mesh/models"
 )
@@ -34,6 +35,18 @@ func (r *agentsRepo) ListActive(ctx context.Context) (agents []models.Agent, err
 		return agents, result.Error
 	}
 	return agents, nil
+}
+
+// ListAgentsSinceFilterByActive returns all agents that haven't been updated since given time, filtered by isActive (bool)
+func (r *agentsRepo) ListAgentsSinceFilterByActive(ctx context.Context, isActive bool, t time.Time) (agent []models.Agent, err error) {
+	result := r.db.
+		Where("active = ?", isActive).
+		Where("updated_at > ?", t).
+		Find(&agent)
+	if result.Error != nil {
+		return agent, result.Error
+	}
+	return agent, nil
 }
 
 // Register registers the agent
