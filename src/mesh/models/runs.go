@@ -10,9 +10,9 @@ import (
 type Run struct {
 	UUID       string `gorm:"primaryKey"`
 	Agent      string
-	Plan       string `gorm:"not null;default:null"`
-	Labels     pq.StringArray
-	Payload    []byte `gorm:"default:null"`
+	Plan       string         `gorm:"not null;default:null"`
+	Labels     pq.StringArray `gorm:"type:text[]"`
+	Payload    []byte
 	Status     string
 	AssignedAt time.Time `gorm:"default:null"`
 	StartedAt  time.Time `gorm:"default:null"`
