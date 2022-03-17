@@ -1,15 +1,19 @@
 package main
 
 import (
+	"context"
+
 	"github.com/do87/poly/src/mesh"
 )
 
 func main() {
+	ctx := context.Background()
+
 	mesh.New(mesh.Config{
 		API: mesh.APIConfig{
 			BindAddr: "127.0.0.1",
 			BindPort: 8080,
 		},
 		DBConn: "postgres://postgres:postgres@127.0.0.1:5432/poly?sslmode=disable",
-	}).Run()
+	}).Run(ctx)
 }
