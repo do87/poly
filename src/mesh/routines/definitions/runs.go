@@ -11,6 +11,6 @@ func AssignAgentToRuns(ctx context.Context) {
 func FindInactiveAgents(ctx context.Context) {
 }
 
-// If an agent is marked as inactive but has a running job it needs to be marked as cancelled
+// CancelRunsForInactiveAgents If an agent is marked as inactive but has a running job it needs to be marked as cancelled
 func CancelRunsForInactiveAgents(ctx context.Context) {
 }
