@@ -13,6 +13,7 @@ import (
 type RunsRepository interface {
 	Get(ctx context.Context, name string) (models.Run, error)
 	List(ctx context.Context) ([]models.Run, error)
+	ListPending(ctx context.Context, agentID string) ([]models.Run, error)
 	Create(ctx context.Context, run models.Run) (models.Run, error)
 	Update(ctx context.Context, run models.Run) (models.Run, error)
 }
@@ -33,6 +34,11 @@ type runsUsecase struct {
 // List returns a list of all runs
 func (u *runsUsecase) List(ctx context.Context, r *http.Request) ([]models.Run, error) {
 	return u.repo.List(ctx)
+}
+
+// List returns a list of all runs
+func (u *runsUsecase) ListPending(ctx context.Context, r *http.Request, agentID string) ([]models.Run, error) {
+	return u.repo.ListPending(ctx, agentID)
 }
 
 // Create creates a new run

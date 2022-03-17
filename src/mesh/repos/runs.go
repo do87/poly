@@ -29,6 +29,15 @@ func (r *runsRepo) List(ctx context.Context) (keys []models.Run, err error) {
 	return keys, nil
 }
 
+// List pending runs
+func (r *runsRepo) ListPending(ctx context.Context, agentID string) (keys []models.Run, err error) {
+	result := r.db.Where("status = ?", common.RUN_STATUS_PENDING).Where("agent = ?", agentID).Order("created_at DESC").Find(&keys)
+	if result.Error != nil {
+		return keys, result.Error
+	}
+	return keys, nil
+}
+
 // ListCreated returns all new runs with unassigned agent
 func (r *runsRepo) ListCreated(ctx context.Context) (keys []models.Run, err error) {
 	result := r.db.Where("status = ?", common.RUN_STATUS_CREATED).Order("created_at DESC").Find(&keys)
