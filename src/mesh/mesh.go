@@ -66,7 +66,7 @@ func (m *mesh) Register(handlers ...api.Handler) *mesh {
 // Run runs the mesh server
 func (m *mesh) Run() {
 	defer m.Cleanup()
-	go routines.Run()
+	go routines.Run(m.db, m.log)
 	m.api.Run()
 }
 

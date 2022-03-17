@@ -10,12 +10,13 @@ import (
 
 // Run status related costs
 const (
-	RUN_STATUS_CREATED  = "created"
-	RUN_STATUS_PENDING  = "pending"
-	RUN_STATUS_RUNNING  = "running"
-	RUN_STATUS_SUCCESS  = "success"
-	RUN_STATUS_ERROR    = "error"
-	RUN_STATUS_CANCELED = "canceled"
+	RUN_STATUS_CREATED   = "created"
+	RUN_STATUS_PENDING   = "pending"
+	RUN_STATUS_RUNNING   = "running"
+	RUN_STATUS_SUCCESS   = "success"
+	RUN_STATUS_ERROR     = "error"
+	RUN_STATUS_CANCELED  = "canceled"
+	RUN_STATUS_NO_AGENTS = "no_agents"
 )
 
 // SetRunStatus modifies a given model according to the provided status
@@ -31,6 +32,8 @@ func SetRunStatus(run *models.Run, status string) error {
 		handleRunStatusPending(run)
 	case RUN_STATUS_RUNNING:
 		handleRunStatusRunning(run)
+	case RUN_STATUS_NO_AGENTS:
+		fallthrough
 	case RUN_STATUS_CANCELED:
 		fallthrough
 	case RUN_STATUS_ERROR:
@@ -71,6 +74,8 @@ func validateRunStatus(status string) error {
 	case RUN_STATUS_RUNNING:
 		fallthrough
 	case RUN_STATUS_SUCCESS:
+		fallthrough
+	case RUN_STATUS_NO_AGENTS:
 		return nil
 	}
 	return errors.New("invalid run status")

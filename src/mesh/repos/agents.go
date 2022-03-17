@@ -27,6 +27,15 @@ func (r *agentsRepo) List(ctx context.Context) (agents []models.Agent, err error
 	return agents, nil
 }
 
+// ListActive returns all active agents
+func (r *agentsRepo) ListActive(ctx context.Context) (agents []models.Agent, err error) {
+	result := r.db.Where("active", true).Order("last_assigned_at DESC").Find(&agents)
+	if result.Error != nil {
+		return agents, result.Error
+	}
+	return agents, nil
+}
+
 // Register registers the agent
 func (r *agentsRepo) Register(ctx context.Context, agent models.Agent) (models.Agent, error) {
 	if result := r.db.FirstOrCreate(&agent, "uuid = ?", agent.UUID); result.Error != nil {
@@ -42,4 +51,13 @@ func (r *agentsRepo) Deregister(ctx context.Context, id string) (models.Agent, e
 		return a, err
 	}
 	return a, nil
+}
+
+// Update updates an agent by UUID
+func (r *agentsRepo) Update(ctx context.Context, agent models.Agent) (models.Agent, error) {
+	m := &models.Agent{}
+	if err := r.db.Model(m).Where("uuid = ?", agent.UUID).Updates(agent).Error; err != nil {
+		return agent, err
+	}
+	return agent, nil
 }
