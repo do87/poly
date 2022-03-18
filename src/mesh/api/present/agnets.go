@@ -15,7 +15,7 @@ const (
 	KEY_AGENTS             = "poly:agents"
 )
 
-type agent struct {
+type TypeAgent struct {
 	UUID      string    `json:"id"`
 	Hostname  string    `json:"hostname"`
 	Active    bool      `json:"active"`
@@ -26,8 +26,8 @@ type agent struct {
 }
 
 // FromModel converts model to presenter struct
-func (agent) FromModel(m models.Agent) agent {
-	return agent{
+func (TypeAgent) FromModel(m models.Agent) TypeAgent {
+	return TypeAgent{
 		UUID:      m.UUID,
 		Hostname:  m.Hostname,
 		Active:    m.Active,
@@ -38,11 +38,11 @@ func (agent) FromModel(m models.Agent) agent {
 	}
 }
 
-var _a = agent{}
+var _a = TypeAgent{}
 
 // Agents presents agents
-func Agents(agentModels []models.Agent) Presentor {
-	p := make([]agent, 0)
+func Agents(agentModels []models.Agent) Presentor[[]TypeAgent] {
+	p := make([]TypeAgent, 0)
 	u := ""
 	for _, m := range agentModels {
 		u += fmt.Sprintf("%s-%s-%s;", m.UUID, m.Hostname, m.UpdatedAt.String())
@@ -52,12 +52,12 @@ func Agents(agentModels []models.Agent) Presentor {
 }
 
 // Agent presents agent
-func Agent(m models.Agent) Presentor {
+func Agent(m models.Agent) Presentor[TypeAgent] {
 	u := fmt.Sprintf("%s-%s-%s;", m.UUID, m.Hostname, m.UpdatedAt.String())
 	return wrap(KEY_AGENTS, etag.Generate(u, true), _a.FromModel(m))
 }
 
 // AccessToken presents agent's access token
-func AccessToken(t string) Presentor {
+func AccessToken(t string) Presentor[string] {
 	return wrap(KEY_AGENT_ACCESS_TOKEN, etag.Generate(t, true), t)
 }

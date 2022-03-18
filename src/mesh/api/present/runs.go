@@ -14,7 +14,7 @@ const (
 	KEY_RUNS = "poly:runs"
 )
 
-type run struct {
+type TypeRun struct {
 	UUID       string    `json:"id"`
 	Agent      string    `json:"agent_id"`
 	Plan       string    `json:"plan"`
@@ -29,8 +29,8 @@ type run struct {
 }
 
 // FromModel converts model to presenter struct
-func (run) FromModel(m models.Run) run {
-	return run{
+func (TypeRun) FromModel(m models.Run) TypeRun {
+	return TypeRun{
 		UUID:       m.UUID,
 		Agent:      m.Agent,
 		Plan:       m.Plan,
@@ -45,11 +45,11 @@ func (run) FromModel(m models.Run) run {
 	}
 }
 
-var _r = run{}
+var _r = TypeRun{}
 
 // Runs presents agent runs
-func Runs(models []models.Run) Presentor {
-	p := make([]run, 0)
+func Runs(models []models.Run) Presentor[[]TypeRun] {
+	p := make([]TypeRun, 0)
 	u := ""
 	for _, m := range models {
 		u += fmt.Sprintf("%s-%s;", m.UUID, m.UpdatedAt.String())
@@ -59,7 +59,7 @@ func Runs(models []models.Run) Presentor {
 }
 
 // Run presents an agent run
-func Run(m models.Run) Presentor {
+func Run(m models.Run) Presentor[TypeRun] {
 	u := fmt.Sprintf("%s-%s;", m.UUID, m.UpdatedAt.String())
 	return wrap(KEY_RUN, etag.Generate(u, true), _r.FromModel(m))
 }

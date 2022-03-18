@@ -14,7 +14,7 @@ const (
 	KEY_AGENT_KEYS = "poly:agent-keys"
 )
 
-type key struct {
+type TypeKey struct {
 	Name      string    `json:"name"`
 	PublicKey string    `json:"public_key"`
 	ExpiresAt time.Time `json:"expires_at"`
@@ -23,8 +23,8 @@ type key struct {
 }
 
 // FromModel converts model to presenter struct
-func (key) FromModel(m models.Key) key {
-	return key{
+func (TypeKey) FromModel(m models.Key) TypeKey {
+	return TypeKey{
 		Name:      m.Name,
 		PublicKey: string(m.PublicKey),
 		ExpiresAt: m.ExpiresAt,
@@ -33,11 +33,11 @@ func (key) FromModel(m models.Key) key {
 	}
 }
 
-var _k = key{}
+var _k = TypeKey{}
 
 // Keys presents agent keys
-func Keys(keyModels []models.Key) Presentor {
-	p := make([]key, 0)
+func Keys(keyModels []models.Key) Presentor[[]TypeKey] {
+	p := make([]TypeKey, 0)
 	u := ""
 	for _, m := range keyModels {
 		u += fmt.Sprintf("%s-%s;", m.Name, m.UpdatedAt.String())
@@ -47,7 +47,7 @@ func Keys(keyModels []models.Key) Presentor {
 }
 
 // Key presents an agent key
-func Key(m models.Key) Presentor {
+func Key(m models.Key) Presentor[TypeKey] {
 	u := fmt.Sprintf("%s-%s;", m.Name, m.UpdatedAt.String())
 	return wrap(KEY_AGENT_KEY, etag.Generate(u, true), _k.FromModel(m))
 }

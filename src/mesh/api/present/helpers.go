@@ -6,14 +6,17 @@ import (
 )
 
 // Presentor is the response struct
-type Presentor struct {
-	Kind string      `json:"kind"`
-	Etag string      `json:"etag,omitempty"`
-	Data interface{} `json:"data"`
+type SupportedDataTypes interface {
+	interface{} | string | TypeRun | []TypeRun | TypeKey | []TypeKey | TypeAgent | []TypeAgent
+}
+type Presentor[K SupportedDataTypes] struct {
+	Kind string `json:"kind"`
+	Etag string `json:"etag,omitempty"`
+	Data K      `json:"data"`
 }
 
-func wrap(kind, etag string, data interface{}) Presentor {
-	return Presentor{
+func wrap[K SupportedDataTypes](kind, etag string, data K) Presentor[K] {
+	return Presentor[K]{
 		Kind: kind,
 		Etag: etag,
 		Data: data,
@@ -21,7 +24,7 @@ func wrap(kind, etag string, data interface{}) Presentor {
 }
 
 // Generic makes wrap functionality public
-var Generic = wrap
+var Generic = wrap[interface{}]
 
 type errorPayload struct {
 	HTTPStatus int    `json:"httpStatus"`
@@ -37,7 +40,15 @@ func Error(w http.ResponseWriter, r *http.Request, httpStatusCode int, err error
 	}
 }
 
-func Unmarshal(b []byte) (p Presentor, err error) {
+func Unmarshal[K SupportedDataTypes](b []byte) (p Presentor[K], err error) {
 	err = json.Unmarshal(b, &p)
 	return
+}
+
+func GetDataFromBytes[K SupportedDataTypes](b []byte) (d K, err error) {
+	p, err := Unmarshal[K](b)
+	if err != nil {
+		return
+	}
+	return p.Data, nil
 }

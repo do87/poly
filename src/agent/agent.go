@@ -15,7 +15,6 @@ import (
 
 	"github.com/do87/poly/src/mesh/api/payloads"
 	"github.com/do87/poly/src/mesh/api/present"
-	"github.com/do87/poly/src/mesh/models"
 	"github.com/do87/poly/src/pkg/auth"
 	"github.com/do87/poly/src/pkg/client"
 	"github.com/do87/poly/src/pkg/logger"
@@ -239,9 +238,9 @@ func (a *agent) poll(ctx context.Context, log logger.Log) {
 	}
 
 	for _, _run := range runs {
-		run, ok := _run.(models.Run)
+		run, ok := _run.(present.Run)
 		if !ok {
-			log.Error("couldn't parse run data")
+			log.Error("couldn't parse run from data", "data", _run)
 			return
 		}
 		request := &request{
