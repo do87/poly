@@ -58,6 +58,25 @@ type Config struct {
 // Labels are the agent labels
 type Labels []string
 
+// New returns a new agent
+func New(cfg ...Config) *agent {
+	a := &agent{
+		MaxParallel:  3,
+		PlanTimeout:  2 * time.Hour,
+		PollInterval: 5 * time.Second,
+		plans:        map[string]*Plan{},
+		labels:       Labels{},
+		hostname:     os.Getenv("HOST"),
+	}
+	for _, c := range cfg {
+		a.SetLabels(c.Labels)
+		a.SetHost(c.AgentHost)
+		a.SetClient(c.MeshURL)
+		a.SetKey(c.Key)
+	}
+	return a
+}
+
 func (a *agent) execute(ctx context.Context, log *logger.Logger, plan *Plan, request *request) {
 	t := (*polytree.Tree)(plan).Init()
 	t.ExecuteWithTimeout(ctx, log, request.ID, request.Payload, a.PlanTimeout)
@@ -83,25 +102,6 @@ func (a *agent) removeFromRunning(plan *Plan) {
 	a.runLock.Lock()
 	defer a.runLock.Unlock()
 	a.running = newRunning
-}
-
-// New returns a new agent
-func New(cfg ...Config) *agent {
-	a := &agent{
-		MaxParallel:  3,
-		PlanTimeout:  2 * time.Hour,
-		PollInterval: 5 * time.Second,
-		plans:        map[string]*Plan{},
-		labels:       Labels{},
-		hostname:     os.Getenv("HOST"),
-	}
-	for _, c := range cfg {
-		a.SetLabels(c.Labels)
-		a.SetHost(c.AgentHost)
-		a.SetClient(c.MeshURL)
-		a.SetKey(c.Key)
-	}
-	return a
 }
 
 // SetLabels sets agent labels
@@ -139,14 +139,23 @@ func (a *agent) Plans(plans ...*Plan) *agent {
 	return a
 }
 
-// Run runs the agent
-func (a *agent) Run(ctx context.Context) {
-	log, logsync := logger.New()
-	defer logsync()
+func (a *agent) getPlanKeys() []string {
+	keys := []string{}
+	for _, plan := range a.plans {
+		keys = append(keys, plan.Key)
+	}
+	return keys
+}
 
+// Run runs the agent
+func (a *agent) Run(ctx context.Context, log *logger.Logger) {
 	ctx, stop := signal.NotifyContext(ctx, os.Interrupt, syscall.SIGTERM)
 	ticker := time.NewTicker(a.PollInterval)
 	a.uuid = uuid.Generate()
+	log.Info("agent starting up:")
+	log.Info("- UUID: " + a.uuid.String())
+	log.Info("- Labels: " + strings.Join(a.labels, ", "))
+	log.Info("- Plans: " + strings.Join(a.getPlanKeys(), ", "))
 
 	log.Info("registering agent...")
 	res, err := a.registerAgent(ctx)

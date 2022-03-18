@@ -21,6 +21,14 @@ func New() (*Logger, func() error) {
 	}, log.Sync
 }
 
+// NewDevelopment creates a new Logger for development
+func NewDevelopment() (*Logger, func() error) {
+	log, _ := zap.NewDevelopment()
+	return &Logger{
+		comp: log,
+	}, log.Sync
+}
+
 // ChiMiddleware returns a chi specific logging middleware
 func (l *Logger) ChiMiddleware() func(http.Handler) http.Handler {
 	return chizap.New(l.comp, &chizap.Opts{
