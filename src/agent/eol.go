@@ -10,7 +10,7 @@ import (
 
 // eol handles agent end of life
 func (a *agent) eol(log logger.Log, stop context.CancelFunc) {
-	log.Info("⚰️ agent end of life")
+	log.Info("⚰️  agent end of life")
 	// code to run before agent stops
 	a.destructor(log)
 

@@ -118,7 +118,7 @@ func (a *agent) Run(ctx context.Context) {
 	ticker := time.NewTicker(a.PollInterval)
 	a.uuid = uuid.Generate()
 	a.log.Info("⏫ agent starting up:")
-	a.log.Info("- UUID: " + a.uuid.String())
+	a.log.Info("- Agent UUID: " + a.uuid.String())
 	a.log.Info("- Labels: " + strings.Join(a.labels, ", "))
 	a.log.Info("- Supported Plans: " + strings.Join(a.getPlanKeys(), ", "))
 
