@@ -19,8 +19,13 @@ func Run(ctx context.Context, log logger.Log, db *db.DB) {
 
 	r := repos.New(db)
 	agents := usecases.NewAgentsUsecase(r.Agents)
-	cron.Every(2).Second().SingletonMode().Do(definitions.AssignAgentToRuns, ctx, log, agents)
-	cron.Every(30).Second().Do(definitions.FindInactiveAgents, ctx, log, r)
-	cron.Every(1).Minute().Do(definitions.CancelRunsForInactiveAgents, ctx, log, r)
+	runs := usecases.NewRunsUsecase(r.Runs)
+
+	// agent routines
+	cron.Every(30).Second().Do(definitions.MarkInactiveAgents, ctx, log, agents)
+
+	// runs routines
+	cron.Every(2).Second().SingletonMode().Do(definitions.AssignAgentToRuns, ctx, log, runs, agents)
+	cron.Every(1).Minute().Do(definitions.CancelRunsForInactiveAgents, ctx, log, runs, agents)
 	cron.StartBlocking()
 }

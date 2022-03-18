@@ -2,71 +2,21 @@ package definitions
 
 import (
 	"context"
-	"time"
 
 	"github.com/do87/poly/src/mesh/common"
 	"github.com/do87/poly/src/mesh/models"
-	"github.com/do87/poly/src/mesh/repos"
+	"github.com/do87/poly/src/mesh/usecases"
 	"github.com/do87/poly/src/pkg/logger"
 )
 
 // AssignAgentToRuns handle agent assignment to created runs
-func AssignAgentToRuns(ctx context.Context, log logger.Log, r *repos.Repo) {
-	runs, err := r.Runs.ListCreated(ctx)
-	if err != nil {
+func AssignAgentToRuns(ctx context.Context, log logger.Log, r, a *usecases.Usecase) {
+	for _, err := range r.Runs.AssignAgentToRuns(ctx, a.Agents, assignmentProcess) {
 		log.Error(err.Error())
-		return
 	}
-	if len(runs) == 0 {
-		return
-	}
-
-	// get active agents
-	agents, err := r.Agents.ListActive(ctx)
-	if err != nil {
-		log.Error(err.Error())
-		return
-	}
-
-	candidates := findAgentsForRuns(runs, agents)
-	selected := []string{}
-	for _, run := range runs {
-		if len(candidates[run.UUID]) == 0 {
-			if err := updateRun(ctx, r, run, common.RUN_STATUS_NO_AGENTS); err != nil {
-				log.Error(err.Error())
-			}
-			continue
-		}
-		run.Agent = candidates[run.UUID][0]
-		selected = append(selected, run.Agent)
-		if err := updateRun(ctx, r, run, common.RUN_STATUS_PENDING); err != nil {
-			log.Error(err.Error())
-		}
-	}
-
-	for _, agent := range agents {
-		if !common.Contains(selected, agent.UUID) {
-			continue
-		}
-		agent.LastAssignedAt = time.Now()
-		if _, err := r.Agents.Update(ctx, agent); err != nil {
-			log.Error(err.Error())
-		}
-	}
-
 }
 
-func updateRun(ctx context.Context, r *repos.Repo, run models.Run, status string) error {
-	if err := common.SetRunStatus(&run, status); err != nil {
-		return err
-	}
-	if _, err := r.Runs.Update(ctx, run); err != nil {
-		return err
-	}
-	return nil
-}
-
-func findAgentsForRuns(runs []models.Run, agents []models.Agent) map[string][]string {
+func assignmentProcess(runs []models.Run, agents []models.Agent) map[string]string {
 	candidates := map[string][]string{}
 	for _, run := range runs {
 		candidates[run.UUID] = []string{}
@@ -83,13 +33,15 @@ func findAgentsForRuns(runs []models.Run, agents []models.Agent) map[string][]st
 	return filterCandidates(candidates)
 }
 
-func filterCandidates(candidates map[string][]string) map[string][]string {
+func filterCandidates(candidates map[string][]string) map[string]string {
 	counters := map[string]int{}
+	flattened := map[string]string{}
 	for runID, agents := range candidates {
+		flattened[runID] = ""
 		for _, a := range agents {
 			counters[a]++
 		}
-		if len(agents) <= 1 {
+		if len(agents) == 0 {
 			continue
 		}
 		min := agents[0]
@@ -103,43 +55,14 @@ func filterCandidates(candidates map[string][]string) map[string][]string {
 				counters[a]--
 			}
 		}
-		candidates[runID] = []string{min}
+		flattened[runID] = min
 	}
-	return candidates
+	return flattened
 }
 
 // CancelRunsForInactiveAgents If an agent is marked as inactive but has a running job it needs to be marked as cancelled
-func CancelRunsForInactiveAgents(ctx context.Context, log logger.Log, r *repos.Repo) {
-	runs, err := r.Runs.ListPendingSince(ctx, time.Now().Add(time.Minute*time.Duration(-10)))
-	if err != nil {
+func CancelRunsForInactiveAgents(ctx context.Context, log logger.Log, r, a *usecases.Usecase) {
+	if err := r.Runs.CancelRunsForInactiveAgents(ctx, a.Agents); err != nil {
 		log.Error(err.Error())
-		return
 	}
-
-	runsToCancel := findRunsToCancel(ctx, log, r, runs)
-	for _, run := range runsToCancel {
-		if err := updateRun(ctx, r, run, common.RUN_STATUS_CANCELED); err != nil {
-			log.Error(err.Error())
-		}
-	}
-}
-
-func findRunsToCancel(ctx context.Context, log logger.Log, r *repos.Repo, runs []models.Run) []models.Run {
-	toCancel := []models.Run{}
-	for _, run := range runs {
-		if run.Agent == "" {
-			log.Warning("found a run in pending state with no agent uuid", "run", run.UUID)
-			toCancel = append(toCancel, run)
-			continue
-		}
-		a, err := r.Agents.Get(ctx, run.Agent)
-		if err != nil {
-			log.Error(err.Error())
-			continue
-		}
-		if !a.Active {
-			toCancel = append(toCancel, run)
-		}
-	}
-	return toCancel
 }
