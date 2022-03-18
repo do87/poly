@@ -31,7 +31,7 @@ type agent struct {
 	log             logger.Log       // logger
 	plans           map[string]*Plan // map of plan keys pointing to plans supported by the worker
 	labels          Labels           // worker tags for filtering requests
-	running         []string         // list of keys of running plans
+	running         []string         // list of keys of running requests
 	runLock         sync.Mutex
 	hostname        string
 	client          *client.Client
@@ -86,33 +86,6 @@ func validateConfig(c Config) {
 	if c.Key.PrivateKey == nil {
 		panic("registration key not configured")
 	}
-}
-
-func (a *agent) execute(ctx context.Context, log logger.Log, plan *Plan, request *request) {
-	t := (*polytree.Tree)(plan).Init()
-	t.ExecuteWithTimeout(ctx, log, request.ID, request.Payload, a.PlanTimeout)
-	a.done(ctx, log, plan)
-}
-
-func (a *agent) done(ctx context.Context, log logger.Log, plan *Plan) *agent { // TODO: tell API when execution finished
-	log.Info("removing plan from agent's running plans list", "plan", plan.Key)
-	a.removeFromRunning(plan)
-	return a
-}
-
-// removeFromRunning removes given plan from running lst
-func (a *agent) removeFromRunning(plan *Plan) {
-	newRunning := []string{}
-	for _, run := range a.running {
-		if run == plan.Key {
-			continue
-		}
-		newRunning = append(newRunning, run)
-	}
-
-	a.runLock.Lock()
-	defer a.runLock.Unlock()
-	a.running = newRunning
 }
 
 // SetHost sets agent host
@@ -264,13 +237,13 @@ func (a *agent) processRequest(ctx context.Context, log logger.Log, request *req
 		}
 	}
 
-	a.markRequestAsRunning(ctx, log, request, plan)
+	a.markRequestAsRunning(ctx, log, request)
 
 	log.Info(fmt.Sprintf("🧑‍🔧 executing request %s", request.ID))
-	go a.execute(ctx, log, plan, request)
+	go a.execute(ctx, log, request, plan)
 }
 
-func (a *agent) markRequestAsRunning(ctx context.Context, log logger.Log, request *request, plan *Plan) {
+func (a *agent) markRequestAsRunning(ctx context.Context, log logger.Log, request *request) {
 	log.Info(fmt.Sprintf("⏱ marking request %s as running", request.ID))
 
 	// api call
@@ -280,7 +253,7 @@ func (a *agent) markRequestAsRunning(ctx context.Context, log logger.Log, reques
 	}
 
 	// append to running list
-	a.running = append(a.running, plan.Key)
+	a.running = append(a.running, request.ID)
 }
 
 func (a *agent) setRunStatus(ctx context.Context, request *request, status string) (err error) {
@@ -290,4 +263,42 @@ func (a *agent) setRunStatus(ctx context.Context, request *request, status strin
 		payloads.RunUpdate{Status: status},
 	)
 	return
+}
+
+func (a *agent) execute(ctx context.Context, log logger.Log, request *request, plan *Plan) {
+	t := (*polytree.Tree)(plan).Init()
+	t.ExecuteWithTimeout(ctx, log, request.ID, request.Payload, a.PlanTimeout)
+	a.done(ctx, log, request, t.HasErrors())
+}
+
+func (a *agent) done(ctx context.Context, log logger.Log, request *request, hasErrors bool) *agent { // TODO: tell API when execution finished
+	text := "successfully"
+	status := common.RUN_STATUS_SUCCESS
+	if hasErrors {
+		text = "with errors"
+		status = common.RUN_STATUS_ERROR
+	}
+	log.Info(fmt.Sprintf("🚦 request %s finished %s", request.ID, text))
+	log.Info(fmt.Sprintf("📤 finalizing request %s", request.ID))
+	a.removeFromRunning(request)
+	if err := a.setRunStatus(ctx, request, status); err != nil {
+		log.Error(err.Error())
+		return a
+	}
+	log.Info("✅ done", "request", request)
+	return a
+}
+
+// removeFromRunning removes given request from running lst
+func (a *agent) removeFromRunning(request *request) {
+	newRunning := []string{}
+	for _, run := range a.running {
+		if run == request.ID {
+			continue
+		}
+		newRunning = append(newRunning, run)
+	}
+	a.runLock.Lock()
+	defer a.runLock.Unlock()
+	a.running = newRunning
 }

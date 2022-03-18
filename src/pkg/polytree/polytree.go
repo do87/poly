@@ -249,3 +249,8 @@ func (t *Tree) getTopNodes() []*Node {
 	}
 	return n
 }
+
+// HasErrors returns true if errors were found
+func (t *Tree) HasErrors() bool {
+	return len(t.errors) > 0
+}
