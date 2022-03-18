@@ -132,7 +132,7 @@ func (u *runsUsecase) updateRunStatus(ctx context.Context, run models.Run, statu
 
 // CancelRunsForInactiveAgents If an agent is marked as inactive but has a running job it needs to be marked as cancelled
 func (u *runsUsecase) CancelRunsForInactiveAgents(ctx context.Context, a *agentsUsecase) error {
-	runs, err := u.repo.ListPendingSince(ctx, time.Now().Add(time.Minute*time.Duration(-10)))
+	runs, err := u.repo.ListPendingSince(ctx, time.Now().Add(-time.Minute*10))
 	if err != nil {
 		return err
 	}

@@ -79,7 +79,7 @@ func (u *agentsUsecase) Ping(ctx context.Context, r *http.Request, id string) (a
 // MarkInactiveAgents checks for agents that didn't make liveness calls > 10 minutes
 // and marks them as inactive
 func (u *agentsUsecase) MarkInactiveAgents(ctx context.Context) error {
-	agents, err := u.repo.ListInactiveSince(ctx, time.Now().Add(time.Minute*time.Duration(-10)))
+	agents, err := u.repo.ListInactiveSince(ctx, time.Now().Add(-time.Minute*10))
 	if err != nil {
 		return err
 	}
