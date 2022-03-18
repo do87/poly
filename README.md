@@ -8,12 +8,6 @@ The project consists of a mesh server which is the single source of truth, and a
 
 <br />
 
-## Example run
-
-![example](statics/run.wip.png)
-
-<br />
-
 ## Workflow
 
 <img src="statics/workflow.png" alt="workflow" align="left">
@@ -25,6 +19,14 @@ The project consists of a mesh server which is the single source of truth, and a
 </span>
 <br><br><br><br><br><br>
 
+
+<br />
+
+### Example run
+
+![example](statics/run.wip.png)
+
+<br />
 ## Mesh server
 
 The mesh server provides an API for the agents to interact with and retrieve runs they need to execute
