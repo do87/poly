@@ -20,14 +20,6 @@ The project consists of a mesh server which is the single source of truth, and a
 <br><br><br><br><br><br>
 
 
-<br />
-
-### Example run
-
-![example](statics/run.wip.png)
-
-<br />
-
 ## Mesh server
 
 The mesh server provides an API for the agents to interact with and retrieve runs they need to execute
@@ -52,3 +44,11 @@ When there's a run request, it specifies which plan should run and the required 
 3. The status changes to `Running` when an agent starts to execute a run
 4. `Success` / `Error` are the usual outcomes of a run
 5. `Canceled` status is given if the run didn't complete due to a shutdown signal
+
+<br />
+
+### Example run
+
+![example](statics/run.wip.png)
+
+<br />
