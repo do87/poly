@@ -8,6 +8,12 @@ The project consists of a mesh server which is the single source of truth, and a
 
 <br />
 
+## Example run
+
+![example](statics/run.png)
+
+<br />
+
 ## Workflow
 
 <img src="statics/workflow.png" alt="workflow" align="left">

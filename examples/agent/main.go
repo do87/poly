@@ -8,11 +8,13 @@ import (
 	"github.com/do87/poly/src/agent"
 	"github.com/do87/poly/src/pkg/auth"
 	"github.com/do87/poly/src/pkg/logger"
+	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
 )
 
 func main() {
 	ctx := context.Background()
-	log, logsync := logger.NewDevelopment()
+	log, logsync := logger.NewDevelopment(zap.IncreaseLevel(zapcore.InfoLevel))
 	defer logsync()
 
 	agent.New(agent.Config{

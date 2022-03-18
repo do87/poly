@@ -26,16 +26,16 @@ type Logger struct {
 }
 
 // New creates a new Logger
-func New() (*Logger, func() error) {
-	log, _ := zap.NewProduction()
+func New(opts ...zap.Option) (*Logger, func() error) {
+	log, _ := zap.NewProduction(opts...)
 	return &Logger{
 		comp: log,
 	}, log.Sync
 }
 
 // NewDevelopment creates a new Logger for development
-func NewDevelopment() (*Logger, func() error) {
-	log, _ := zap.NewDevelopment()
+func NewDevelopment(opts ...zap.Option) (*Logger, func() error) {
+	log, _ := zap.NewDevelopment(opts...)
 	return &Logger{
 		comp: log,
 	}, log.Sync
