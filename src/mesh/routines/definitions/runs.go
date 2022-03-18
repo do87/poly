@@ -11,7 +11,7 @@ import (
 )
 
 // AssignAgentToRuns handle agent assignment to created runs
-func AssignAgentToRuns(ctx context.Context, log *logger.Logger, r *repos.Repo) {
+func AssignAgentToRuns(ctx context.Context, log logger.Log, r *repos.Repo) {
 	runs, err := r.Runs.ListCreated(ctx)
 	if err != nil {
 		log.Error(err.Error())
@@ -109,7 +109,7 @@ func filterCandidates(candidates map[string][]string) map[string][]string {
 }
 
 // CancelRunsForInactiveAgents If an agent is marked as inactive but has a running job it needs to be marked as cancelled
-func CancelRunsForInactiveAgents(ctx context.Context, log *logger.Logger, r *repos.Repo) {
+func CancelRunsForInactiveAgents(ctx context.Context, log logger.Log, r *repos.Repo) {
 	runs, err := r.Runs.ListPendingSince(ctx, time.Now().Add(time.Minute*time.Duration(-10)))
 	if err != nil {
 		log.Error(err.Error())
@@ -124,7 +124,7 @@ func CancelRunsForInactiveAgents(ctx context.Context, log *logger.Logger, r *rep
 	}
 }
 
-func findRunsToCancel(ctx context.Context, log *logger.Logger, r *repos.Repo, runs []models.Run) []models.Run {
+func findRunsToCancel(ctx context.Context, log logger.Log, r *repos.Repo, runs []models.Run) []models.Run {
 	toCancel := []models.Run{}
 	for _, run := range runs {
 		if run.Agent == "" {

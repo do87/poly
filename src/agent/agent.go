@@ -29,6 +29,7 @@ type agent struct {
 	PlanTimeout     time.Duration    // Max time for running plans
 	PollInterval    time.Duration    // how often should the API be checked for new plan runs
 	uuid            uuid.UUID        // auto generated uuid for the agents
+	log             logger.Log       // logger
 	plans           map[string]*Plan // map of plan keys pointing to plans supported by the worker
 	labels          Labels           // worker tags for filtering requests
 	running         []string         // list of keys of running plans
@@ -53,37 +54,48 @@ type Config struct {
 	Key       auth.AgentRegisterKey // key to register the agent with mesh API
 	AgentHost string                // agent hostname
 	MeshURL   string                // mesh API base URL
+	Logger    logger.Log            // the logger
 }
 
 // Labels are the agent labels
 type Labels []string
 
 // New returns a new agent
-func New(cfg ...Config) *agent {
+func New(c Config) *agent {
+	validateConfig(c)
 	a := &agent{
-		MaxParallel:  3,
-		PlanTimeout:  2 * time.Hour,
-		PollInterval: 5 * time.Second,
-		plans:        map[string]*Plan{},
-		labels:       Labels{},
-		hostname:     os.Getenv("HOST"),
+		MaxParallel:     3,
+		PlanTimeout:     2 * time.Hour,
+		PollInterval:    5 * time.Second,
+		plans:           map[string]*Plan{},
+		labels:          c.Labels,
+		hostname:        os.Getenv("HOST"),
+		client:          client.New(c.MeshURL),
+		registrationKey: c.Key,
+		log:             c.Logger,
 	}
-	for _, c := range cfg {
-		a.SetLabels(c.Labels)
-		a.SetHost(c.AgentHost)
-		a.SetClient(c.MeshURL)
-		a.SetKey(c.Key)
-	}
+
+	// override host if specified
+	a.SetHost(c.AgentHost)
 	return a
 }
 
-func (a *agent) execute(ctx context.Context, log *logger.Logger, plan *Plan, request *request) {
+func validateConfig(c Config) {
+	if c.Logger == nil {
+		panic("logger not configured")
+	}
+	if c.Key.PrivateKey == nil {
+		panic("registration key not configured")
+	}
+}
+
+func (a *agent) execute(ctx context.Context, log logger.Log, plan *Plan, request *request) {
 	t := (*polytree.Tree)(plan).Init()
 	t.ExecuteWithTimeout(ctx, log, request.ID, request.Payload, a.PlanTimeout)
 	a.done(ctx, log, plan)
 }
 
-func (a *agent) done(ctx context.Context, log *logger.Logger, plan *Plan) *agent { // TODO: tell API when execution finished
+func (a *agent) done(ctx context.Context, log logger.Log, plan *Plan) *agent { // TODO: tell API when execution finished
 	log.Info("removing plan from agent's running plans list", "plan", plan.Key)
 	a.removeFromRunning(plan)
 	return a
@@ -104,29 +116,10 @@ func (a *agent) removeFromRunning(plan *Plan) {
 	a.running = newRunning
 }
 
-// SetLabels sets agent labels
-func (a *agent) SetLabels(l Labels) {
-	a.labels = append(a.labels, l...)
-}
-
 // SetHost sets agent host
 func (a *agent) SetHost(host string) {
 	if host != "" {
 		a.hostname = host
-	}
-}
-
-// SetClient sets client for mesh interactions
-func (a *agent) SetClient(url string) {
-	if url != "" {
-		a.client = client.New(url)
-	}
-}
-
-// SetKey sets agent registration key
-func (a *agent) SetKey(key auth.AgentRegisterKey) {
-	if key.PrivateKey != nil {
-		a.registrationKey = key
 	}
 }
 
@@ -148,32 +141,32 @@ func (a *agent) getPlanKeys() []string {
 }
 
 // Run runs the agent
-func (a *agent) Run(ctx context.Context, log *logger.Logger) {
+func (a *agent) Run(ctx context.Context) {
 	ctx, stop := signal.NotifyContext(ctx, os.Interrupt, syscall.SIGTERM)
 	ticker := time.NewTicker(a.PollInterval)
 	a.uuid = uuid.Generate()
-	log.Info("agent starting up:")
-	log.Info("- UUID: " + a.uuid.String())
-	log.Info("- Labels: " + strings.Join(a.labels, ", "))
-	log.Info("- Plans: " + strings.Join(a.getPlanKeys(), ", "))
+	a.log.Info("agent starting up:")
+	a.log.Info("- UUID: " + a.uuid.String())
+	a.log.Info("- Labels: " + strings.Join(a.labels, ", "))
+	a.log.Info("- Plans: " + strings.Join(a.getPlanKeys(), ", "))
 
-	log.Info("registering agent...")
+	a.log.Info("registering agent...")
 	res, err := a.registerAgent(ctx)
 	if err != nil {
 		panic(err)
 	}
-	log.Info("parsing answer...")
+	a.log.Info("parsing answer...")
 	if err := a.parseRegistrationResponse(res); err != nil {
 		panic(err)
 	}
 
-	log.Info("agent is running.")
+	a.log.Info("agent is running.")
 	for {
 		select {
 		case <-ticker.C:
-			a.poll(ctx, log)
+			a.poll(ctx, a.log)
 		case <-ctx.Done():
-			a.eol(log, stop)
+			a.eol(a.log, stop)
 			return
 		}
 	}
@@ -227,7 +220,7 @@ type request struct {
 }
 
 // poll checks api for new plan requests
-func (a *agent) poll(ctx context.Context, log *logger.Logger) {
+func (a *agent) poll(ctx context.Context, log logger.Log) {
 	bRuns, err := a.client.Do(ctx, http.MethodGet, fmt.Sprintf("/agent/%s/runs/pending", a.uuid), nil)
 	if err != nil {
 		log.Error(err.Error())
@@ -258,7 +251,7 @@ func (a *agent) poll(ctx context.Context, log *logger.Logger) {
 }
 
 // processRequest find plan keys that match the request
-func (a *agent) processRequest(ctx context.Context, log *logger.Logger, request *request) {
+func (a *agent) processRequest(ctx context.Context, log logger.Log, request *request) {
 	var plan *Plan
 	for _, p := range a.plans {
 		if strings.EqualFold(p.Key, request.Plan) {

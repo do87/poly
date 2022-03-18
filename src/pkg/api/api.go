@@ -28,12 +28,12 @@ type cleanup func() error
 type API struct {
 	router *chi.Mux
 	db     *db.DB
-	log    *logger.Logger
+	log    logger.Log
 	config Config
 }
 
 // New creates a new API
-func New(log *logger.Logger, db *db.DB, c Config) *API {
+func New(log logger.Log, db *db.DB, c Config) *API {
 	return &API{
 		log:    log,
 		router: newRouter(log),
@@ -72,7 +72,7 @@ func (a *API) serverStr() string {
 	return fmt.Sprintf("%s:%d", addr, port)
 }
 
-func newRouter(log *logger.Logger) *chi.Mux {
+func newRouter(log logger.Log) *chi.Mux {
 	r := chi.NewRouter()
 	r.Use(middleware.Timeout(5 * time.Second))
 	r.Use(middleware.RedirectSlashes)

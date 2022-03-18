@@ -4,10 +4,13 @@ import (
 	"context"
 
 	"github.com/do87/poly/src/mesh"
+	"github.com/do87/poly/src/pkg/logger"
 )
 
 func main() {
 	ctx := context.Background()
+	log, logsync := logger.NewDevelopment()
+	defer logsync()
 
 	mesh.New(mesh.Config{
 		API: mesh.APIConfig{

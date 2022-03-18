@@ -13,7 +13,7 @@ import (
 
 type mesh struct {
 	config  Config
-	log     *logger.Logger
+	log     logger.Log
 	db      *db.DB
 	cleanup []cleanup
 	api     *api.API
@@ -26,6 +26,7 @@ type APIConfig = api.Config
 type Config struct {
 	API    APIConfig
 	DBConn string
+	Logger logger.Log
 }
 
 // cleanup is a type of a function to defer
@@ -33,19 +34,25 @@ type cleanup func() error
 
 // New creates a new mesh server
 func New(c Config) *mesh {
-	log, logsync := logger.New()
+	validateConfig(c)
 	m := &mesh{
-		log:     log,
-		cleanup: []cleanup{logsync},
+		cleanup: []cleanup{},
 		db:      setupDatabase(c),
+		log:     c.Logger,
 	}
-	m.api = api.New(log, m.db, c.API)
+	m.api = api.New(c.Logger, m.db, c.API)
 	m.cleanup = append(m.cleanup, m.db.Close)
 	m.Register(
 		health.Handler,
 		meshAPI.Handler,
 	)
 	return m
+}
+
+func validateConfig(c Config) {
+	if c.Logger == nil {
+		panic("logger is required")
+	}
 }
 
 func setupDatabase(c Config) *db.DB {

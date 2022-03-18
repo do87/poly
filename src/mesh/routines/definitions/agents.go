@@ -10,7 +10,7 @@ import (
 
 // FindInactiveAgents checks for agents that didn't make liveness calls > 10 minutes
 // and marks them as inactive
-func FindInactiveAgents(ctx context.Context, log *logger.Logger, r *repos.Repo) {
+func FindInactiveAgents(ctx context.Context, log logger.Log, r *repos.Repo) {
 	agents, err := r.Agents.ListAgentsSinceFilterByActive(ctx, true, time.Now().Add(time.Minute*time.Duration(-10)))
 	if err != nil {
 		log.Error(err.Error())

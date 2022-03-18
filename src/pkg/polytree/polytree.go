@@ -36,7 +36,7 @@ type Node struct {
 }
 
 // Exec is a step of node execution
-type Exec func(ctx context.Context, log *logger.Logger, meta interface{}, payload []byte) (Exec, error)
+type Exec func(ctx context.Context, log logger.Log, meta interface{}, payload []byte) (Exec, error)
 
 // Init returns a new polytree
 func (t *Tree) Init() *Tree {
@@ -78,7 +78,7 @@ func (t *Tree) ParentOf(parent, child *Node) *Tree {
 	return t.AddDependency(parent, child)
 }
 
-func (t *Tree) execNode(ctx context.Context, log *logger.Logger, node *Node, done chan *Node) {
+func (t *Tree) execNode(ctx context.Context, log logger.Log, node *Node, done chan *Node) {
 	ctxWrap, cancel := context.WithTimeout(ctx, t.Timeout)
 	if !t.shouldNodeRun(ctxWrap, cancel, node) {
 		return
@@ -171,7 +171,7 @@ func (t *Tree) shouldNodeRun(ctx context.Context, cancel context.CancelFunc, nod
 }
 
 // ExecuteWithTimeout is used to execute each polytree node.Exec function, with a global run timeout
-func (t *Tree) ExecuteWithTimeout(ctx context.Context, log *logger.Logger, requestID string, payload []byte, timeout time.Duration) {
+func (t *Tree) ExecuteWithTimeout(ctx context.Context, log logger.Log, requestID string, payload []byte, timeout time.Duration) {
 	t.requestID = requestID
 	t.requestPayload = payload
 	ctxWrap, cancel := context.WithTimeout(ctx, timeout)
@@ -182,7 +182,7 @@ func (t *Tree) ExecuteWithTimeout(ctx context.Context, log *logger.Logger, reque
 }
 
 // execute runs all pending nodes
-func (t *Tree) execute(ctx context.Context, log *logger.Logger) {
+func (t *Tree) execute(ctx context.Context, log logger.Log) {
 	if len(t.pendingRun) == 0 {
 		return
 	}

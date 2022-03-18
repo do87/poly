@@ -12,7 +12,7 @@ import (
 )
 
 // Run runs all configured routines
-func Run(ctx context.Context, log *logger.Logger, db *db.DB) {
+func Run(ctx context.Context, log logger.Log, db *db.DB) {
 	cron := gocron.NewScheduler(time.UTC)
 
 	r := repos.New(db)

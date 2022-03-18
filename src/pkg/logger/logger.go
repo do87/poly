@@ -8,6 +8,18 @@ import (
 	"moul.io/chizap"
 )
 
+// Log is the interface used by the agent and mesh server
+type Log interface {
+	ChiMiddleware() func(http.Handler) http.Handler
+	NodeLogger(plan, runID, node string) *Log
+	Info(msg string, args ...interface{})
+	Error(msg string, args ...interface{})
+	Warning(msg string, args ...interface{})
+	Debug(msg string, args ...interface{})
+}
+
+var _ = Log(&Logger{})
+
 // Logger service
 type Logger struct {
 	comp *zap.Logger
@@ -38,7 +50,7 @@ func (l *Logger) ChiMiddleware() func(http.Handler) http.Handler {
 }
 
 // NodeLogger is logger used during node run
-func (l *Logger) NodeLogger(plan, runID, node string) *Logger {
+func (l *Logger) NodeLogger(plan, runID, node string) *Log {
 	log := l.comp.WithOptions(zap.Fields(
 		zap.Field{
 			Key:    "node",
@@ -52,9 +64,11 @@ func (l *Logger) NodeLogger(plan, runID, node string) *Logger {
 		},
 	))
 
-	return &Logger{
+	newLogger := &Logger{
 		comp: log.Named(runID),
 	}
+	t := Log(newLogger)
+	return &t
 }
 
 // Named for namespacing logs
@@ -86,10 +100,4 @@ func (l *Logger) Error(msg string, args ...interface{}) {
 // every 2 args are added as key=value
 func (l *Logger) Debug(msg string, args ...interface{}) {
 	l.comp.WithOptions(zap.AddCallerSkip(1)).Sugar().Debugw(msg, args...)
-}
-
-// Fatal log type
-// every 2 args are added as key=value
-func (l *Logger) Fatal(msg string, args ...interface{}) {
-	l.comp.WithOptions(zap.AddCallerSkip(1)).Sugar().Fatalw(msg, args...)
 }

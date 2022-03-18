@@ -33,12 +33,12 @@ func Plan() *agent.Plan {
 	return p
 }
 
-func stateStorageNode(ctx context.Context, log *logger.Logger, meta interface{}, payload []byte) (agent.Exec, error) {
+func stateStorageNode(ctx context.Context, log logger.Log, meta interface{}, payload []byte) (agent.Exec, error) {
 	log.Info("Handling Terraform State Storage")
 	return nil, nil
 }
 
-func tfRunNode(ctx context.Context, log *logger.Logger, meta interface{}, payload []byte) (agent.Exec, error) {
+func tfRunNode(ctx context.Context, log logger.Log, meta interface{}, payload []byte) (agent.Exec, error) {
 	log.Info("Handling Terraform Run")
 	return nil, nil
 }

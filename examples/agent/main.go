@@ -16,6 +16,7 @@ func main() {
 	defer logsync()
 
 	agent.New(agent.Config{
+		Logger: log,
 		Labels: agent.Labels{
 			"infra", "prod",
 		},
@@ -27,7 +28,7 @@ func main() {
 		MeshURL:   "http://127.0.0.1:8080",
 	}).Plans(
 		infra.Plan(),
-	).Run(ctx, log)
+	).Run(ctx)
 }
 
 func getPrivateKey() []byte {
