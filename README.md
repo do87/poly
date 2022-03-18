@@ -10,7 +10,7 @@ The project consists of a mesh server which is the single source of truth, and a
 
 ## Example run
 
-![example](statics/run.png)
+![example](statics/run_log.png)
 
 <br />
 
