@@ -244,7 +244,7 @@ func (a *agent) processRequest(ctx context.Context, log logger.Log, request *req
 }
 
 func (a *agent) markRequestAsRunning(ctx context.Context, log logger.Log, request *request) {
-	log.Info(fmt.Sprintf("⏱  marking run is %s as running", request.ID))
+	log.Info(fmt.Sprintf("⏱  marking run id %s as running", request.ID))
 
 	// api call
 	if err := a.setRunStatus(ctx, request, common.RUN_STATUS_RUNNING); err != nil {
