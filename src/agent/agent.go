@@ -2,7 +2,6 @@ package agent
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
@@ -191,13 +190,9 @@ func (a *agent) registerAgent(ctx context.Context) ([]byte, error) {
 }
 
 func (a *agent) parseRegistrationResponse(r []byte) error {
-	var res present.Presentor
-	if err := json.Unmarshal(r, &res); err != nil {
+	v, err := present.GetDataFromBytes[string](r)
+	if err != nil {
 		return err
-	}
-	v, ok := res.Data.(string)
-	if !ok {
-		return errors.New("failed to parse response data")
 	}
 	a.client.SetToken(v)
 	return nil
@@ -225,28 +220,17 @@ func (a *agent) poll(ctx context.Context, log logger.Log) {
 		log.Error(err.Error())
 		return
 	}
-	p, err := present.Unmarshal(b)
+
+	runs, err := present.GetDataFromBytes[[]present.TypeRun](b)
 	if err != nil {
 		log.Error(err.Error())
 		return
 	}
-
-	runs, ok := p.Data.([]interface{})
-	if !ok {
-		log.Error("couldn't parse presentor data")
-		return
-	}
-
-	for _, _run := range runs {
-		run, ok := _run.(present.Run)
-		if !ok {
-			log.Error("couldn't parse run from data", "data", _run)
-			return
-		}
+	for _, run := range runs {
 		request := &request{
 			ID:      run.UUID,
 			Plan:    run.Plan,
-			Payload: run.Payload,
+			Payload: []byte(run.Payload),
 		}
 		a.processRequest(ctx, log, request)
 	}
