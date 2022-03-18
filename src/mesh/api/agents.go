@@ -35,6 +35,17 @@ func (a *agents) list(u *usecases.Usecase) http.HandlerFunc {
 	}
 }
 
+func (a *agents) listActive(u *usecases.Usecase) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		data, err := u.Agents.ListActive(r.Context(), r)
+		if err != nil {
+			render.JSON(w, r, present.Error(w, r, http.StatusInternalServerError, err))
+			return
+		}
+		render.JSON(w, r, present.Agents(data))
+	}
+}
+
 func (a *agents) register(u, k *usecases.Usecase) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		agent, err := u.Agents.Register(r.Context(), r, k.Keys)

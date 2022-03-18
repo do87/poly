@@ -18,6 +18,7 @@ const (
 type agent struct {
 	UUID      string    `json:"id"`
 	Hostname  string    `json:"hostname"`
+	Active    bool      `json:"active"`
 	Labels    []string  `json:"labels"`
 	Plans     []string  `json:"plans"`
 	CreatedAt time.Time `json:"created_at"`
@@ -29,6 +30,7 @@ func (agent) FromModel(m models.Agent) agent {
 	return agent{
 		UUID:      m.UUID,
 		Hostname:  m.Hostname,
+		Active:    m.Active,
 		Labels:    m.Labels,
 		Plans:     m.Plans,
 		CreatedAt: m.CreatedAt,

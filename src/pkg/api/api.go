@@ -52,7 +52,7 @@ func (a *API) Register(handlers ...Handler) *API {
 
 // Run runs the API
 func (a *API) Run() {
-	a.log.Info("running server...", "host", a.serverStr())
+	a.log.Info("🚀 running API server", "host", a.serverStr())
 	if err := http.ListenAndServe(a.serverStr(), a.router); err != nil {
 		panic(err)
 	}

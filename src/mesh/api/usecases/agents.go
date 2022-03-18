@@ -15,6 +15,7 @@ import (
 type AgentsRepository interface {
 	Get(ctx context.Context, id string) (agents models.Agent, err error)
 	List(ctx context.Context) ([]models.Agent, error)
+	ListActive(ctx context.Context) ([]models.Agent, error)
 	Register(ctx context.Context, agent models.Agent) (models.Agent, error)
 	Deregister(ctx context.Context, id string) (models.Agent, error)
 	Update(ctx context.Context, agent models.Agent) (models.Agent, error)
@@ -36,6 +37,11 @@ type agentsUsecase struct {
 // List returns a list of all agents
 func (u *agentsUsecase) List(ctx context.Context, r *http.Request) ([]models.Agent, error) {
 	return u.repo.List(ctx)
+}
+
+// ListActive returns a list of all active agents
+func (u *agentsUsecase) ListActive(ctx context.Context, r *http.Request) ([]models.Agent, error) {
+	return u.repo.ListActive(ctx)
 }
 
 // Register registers an agent and returns it

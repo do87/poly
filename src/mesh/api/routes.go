@@ -9,6 +9,7 @@ import (
 func (h *handler) setRoutes() *handler {
 	// agents lifecycle
 	h.route.Get("/agents", h.agents.list(h.agents.uc))                // list all agents
+	h.route.Get("/agents/active", h.agents.listActive(h.agents.uc))   // list all active agents
 	h.route.Post("/agent", h.agents.register(h.agents.uc, h.keys.uc)) // agent registration
 
 	// keys

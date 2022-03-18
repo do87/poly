@@ -145,22 +145,21 @@ func (a *agent) Run(ctx context.Context) {
 	ctx, stop := signal.NotifyContext(ctx, os.Interrupt, syscall.SIGTERM)
 	ticker := time.NewTicker(a.PollInterval)
 	a.uuid = uuid.Generate()
-	a.log.Info("agent starting up:")
+	a.log.Info("⏫ agent starting up:")
 	a.log.Info("- UUID: " + a.uuid.String())
 	a.log.Info("- Labels: " + strings.Join(a.labels, ", "))
-	a.log.Info("- Plans: " + strings.Join(a.getPlanKeys(), ", "))
+	a.log.Info("- Supported Plans: " + strings.Join(a.getPlanKeys(), ", "))
 
-	a.log.Info("registering agent...")
+	a.log.Info("🔐 registering agent...")
 	res, err := a.registerAgent(ctx)
 	if err != nil {
 		panic(err)
 	}
-	a.log.Info("parsing answer...")
 	if err := a.parseRegistrationResponse(res); err != nil {
 		panic(err)
 	}
 
-	a.log.Info("agent is running.")
+	a.log.Info("🚀 agent is running")
 	for {
 		select {
 		case <-ticker.C:
