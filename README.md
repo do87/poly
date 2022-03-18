@@ -49,6 +49,6 @@ When there's a run request, it specifies which plan should run and the required 
 
 ### Example run
 
-![example](statics/run.light.png)
+![example](statics/run.png)
 
 <br />
