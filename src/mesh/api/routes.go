@@ -27,7 +27,7 @@ func (h *handler) setRoutes() *handler {
 		// runs lifecycle
 		h.route.Get("/runs", h.runs.list(h.runs.uc))
 		h.route.Post("/run", h.runs.create(h.runs.uc))
-		h.route.Put("/run/{id}", h.runs.create(h.runs.uc))
+		h.route.Patch("/run/{id}", h.runs.update(h.runs.uc))
 	})
 
 	return h

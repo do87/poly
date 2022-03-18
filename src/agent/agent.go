@@ -14,6 +14,7 @@ import (
 
 	"github.com/do87/poly/src/mesh/api/payloads"
 	"github.com/do87/poly/src/mesh/api/present"
+	"github.com/do87/poly/src/mesh/common"
 	"github.com/do87/poly/src/pkg/auth"
 	"github.com/do87/poly/src/pkg/client"
 	"github.com/do87/poly/src/pkg/logger"
@@ -238,6 +239,7 @@ func (a *agent) poll(ctx context.Context, log logger.Log) {
 
 // processRequest find plan keys that match the request
 func (a *agent) processRequest(ctx context.Context, log logger.Log, request *request) {
+	log.Info(fmt.Sprintf("📋 processing request %s with plan %s", request.ID, request.Plan), "payload", request.Payload)
 	var plan *Plan
 	for _, p := range a.plans {
 		if strings.EqualFold(p.Key, request.Plan) {
@@ -262,9 +264,30 @@ func (a *agent) processRequest(ctx context.Context, log logger.Log, request *req
 		}
 	}
 
-	log.Info("Marking request as 'running'", "request", request)
-	a.running = append(a.running, plan.Key)
+	a.markRequestAsRunning(ctx, log, request, plan)
 
-	log.Info("Executing request", "request", request)
+	log.Info(fmt.Sprintf("🧑‍🔧 executing request %s", request.ID))
 	go a.execute(ctx, log, plan, request)
+}
+
+func (a *agent) markRequestAsRunning(ctx context.Context, log logger.Log, request *request, plan *Plan) {
+	log.Info(fmt.Sprintf("⏱ marking request %s as running", request.ID))
+
+	// api call
+	if err := a.setRunStatus(ctx, request, common.RUN_STATUS_RUNNING); err != nil {
+		log.Error(err.Error())
+		return
+	}
+
+	// append to running list
+	a.running = append(a.running, plan.Key)
+}
+
+func (a *agent) setRunStatus(ctx context.Context, request *request, status string) (err error) {
+	_, err = a.client.Do(ctx,
+		http.MethodPatch,
+		fmt.Sprintf("/run/%s", request.ID),
+		payloads.RunUpdate{Status: status},
+	)
+	return
 }
