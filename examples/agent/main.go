@@ -14,7 +14,15 @@ import (
 
 func main() {
 	ctx := context.Background()
-	log, logsync := logger.NewDevelopment(zap.IncreaseLevel(zapcore.InfoLevel))
+
+	cfg := zap.NewDevelopmentConfig()
+	cfg.EncoderConfig.StacktraceKey = zapcore.OmitKey
+	cfg.EncoderConfig.CallerKey = zapcore.OmitKey
+	cfg.EncoderConfig.TimeKey = zapcore.OmitKey
+	cfg.EncoderConfig.NameKey = zapcore.OmitKey
+	cfg.Level.SetLevel(zapcore.InfoLevel)
+	custom, _ := cfg.Build()
+	log, logsync := logger.NewCustom(custom)
 	defer logsync()
 
 	agent.New(agent.Config{

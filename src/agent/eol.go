@@ -10,7 +10,7 @@ import (
 
 // eol handles agent end of life
 func (a *agent) eol(log logger.Log, stop context.CancelFunc) {
-	log.Info("agent end of life:")
+	log.Info("⚰️ agent end of life")
 	// code to run before agent stops
 	a.destructor(log)
 
@@ -20,7 +20,7 @@ func (a *agent) eol(log logger.Log, stop context.CancelFunc) {
 
 // destructor contains logic that runs right before the agent is stopped
 func (a *agent) destructor(log logger.Log) {
-	log.Info("- marking agent as inactive")
+	log.Info("🙅‍♀️ marking agent as inactive")
 	if _, err := a.client.Do(context.TODO(), http.MethodDelete, "/agent/"+a.uuid.String(), nil); err != nil {
 		log.Error(err.Error())
 	}
