@@ -13,6 +13,7 @@ func main() {
 	defer logsync()
 
 	mesh.New(mesh.Config{
+		Logger: log,
 		API: mesh.APIConfig{
 			BindAddr: "127.0.0.1",
 			BindPort: 8080,

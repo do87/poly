@@ -29,14 +29,14 @@ func (h *runs) list(u *usecases.Usecase) http.HandlerFunc {
 	}
 }
 
-func (h *runs) listPending(u *usecases.Usecase) http.HandlerFunc {
+func (h *runs) listPending(ruc, a *usecases.Usecase) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		id := chi.URLParam(r, "id")
-		if _, err := u.Agents.Ping(r.Context(), r, id); err != nil {
+		if _, err := a.Agents.Ping(r.Context(), r, id); err != nil {
 			render.JSON(w, r, present.Error(w, r, http.StatusInternalServerError, err))
 			return
 		}
-		data, err := u.Runs.ListPending(r.Context(), r, id)
+		data, err := ruc.Runs.ListPending(r.Context(), r, id)
 		if err != nil {
 			render.JSON(w, r, present.Error(w, r, http.StatusInternalServerError, err))
 			return

@@ -35,9 +35,9 @@ func (a *agents) list(u *usecases.Usecase) http.HandlerFunc {
 	}
 }
 
-func (a *agents) register(u *usecases.Usecase) http.HandlerFunc {
+func (a *agents) register(u, k *usecases.Usecase) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		agent, err := u.Agents.Register(r.Context(), r, u.Keys)
+		agent, err := u.Agents.Register(r.Context(), r, k.Keys)
 		if err != nil {
 			render.JSON(w, r, present.Error(w, r, http.StatusInternalServerError, err))
 			return

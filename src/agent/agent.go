@@ -221,31 +221,35 @@ type request struct {
 
 // poll checks api for new plan requests
 func (a *agent) poll(ctx context.Context, log logger.Log) {
-	bRuns, err := a.client.Do(ctx, http.MethodGet, fmt.Sprintf("/agent/%s/runs/pending", a.uuid), nil)
+	log.Debug("checking for pending runs...")
+	b, err := a.client.Do(ctx, http.MethodGet, fmt.Sprintf("/agent/%s/runs/pending", a.uuid), nil)
 	if err != nil {
 		log.Error(err.Error())
 		return
 	}
-	var p present.Presentor
-	if err := json.Unmarshal(bRuns, &p); err != nil {
+	p, err := present.Unmarshal(b)
+	if err != nil {
 		log.Error(err.Error())
 		return
 	}
 
-	runs, ok := p.Data.([]models.Run)
+	runs, ok := p.Data.([]interface{})
 	if !ok {
 		log.Error("couldn't parse presentor data")
 		return
 	}
 
-	for _, run := range runs {
-
+	for _, _run := range runs {
+		run, ok := _run.(models.Run)
+		if !ok {
+			log.Error("couldn't parse run data")
+			return
+		}
 		request := &request{
 			ID:      run.UUID,
 			Plan:    run.Plan,
 			Payload: run.Payload,
 		}
-
 		a.processRequest(ctx, log, request)
 	}
 }

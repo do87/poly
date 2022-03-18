@@ -1,6 +1,7 @@
 package present
 
 import (
+	"encoding/json"
 	"net/http"
 )
 
@@ -34,4 +35,9 @@ func Error(w http.ResponseWriter, r *http.Request, httpStatusCode int, err error
 		HTTPStatus: httpStatusCode,
 		Error:      err.Error(),
 	}
+}
+
+func Unmarshal(b []byte) (p Presentor, err error) {
+	err = json.Unmarshal(b, &p)
+	return
 }

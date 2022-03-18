@@ -39,12 +39,12 @@ func (u *agentsUsecase) List(ctx context.Context, r *http.Request) ([]models.Age
 }
 
 // Register registers an agent and returns it
-func (u *agentsUsecase) Register(ctx context.Context, r *http.Request, keysUc *keysUsecase) (agent models.Agent, err error) {
+func (u *agentsUsecase) Register(ctx context.Context, r *http.Request, k *keysUsecase) (agent models.Agent, err error) {
 	var payload payloads.AgentRegister
 	if err = json.NewDecoder(r.Body).Decode(&payload); err != nil {
 		return
 	}
-	key, err := keysUc.repo.Get(ctx, payload.EncodedKey.Name)
+	key, err := k.repo.Get(ctx, payload.EncodedKey.Name)
 	if err != nil {
 		return
 	}

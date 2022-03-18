@@ -11,7 +11,7 @@ import (
 // Log is the interface used by the agent and mesh server
 type Log interface {
 	ChiMiddleware() func(http.Handler) http.Handler
-	NodeLogger(plan, runID, node string) *Log
+	NodeLogger(plan, runID, node string) Log
 	Info(msg string, args ...interface{})
 	Error(msg string, args ...interface{})
 	Warning(msg string, args ...interface{})
@@ -50,7 +50,7 @@ func (l *Logger) ChiMiddleware() func(http.Handler) http.Handler {
 }
 
 // NodeLogger is logger used during node run
-func (l *Logger) NodeLogger(plan, runID, node string) *Log {
+func (l *Logger) NodeLogger(plan, runID, node string) Log {
 	log := l.comp.WithOptions(zap.Fields(
 		zap.Field{
 			Key:    "node",
@@ -64,11 +64,9 @@ func (l *Logger) NodeLogger(plan, runID, node string) *Log {
 		},
 	))
 
-	newLogger := &Logger{
+	return Log(&Logger{
 		comp: log.Named(runID),
-	}
-	t := Log(newLogger)
-	return &t
+	})
 }
 
 // Named for namespacing logs
