@@ -36,7 +36,7 @@ func (h *runs) listPending(ruc, a *usecases.Usecase) http.HandlerFunc {
 			render.JSON(w, r, present.Error(w, r, http.StatusInternalServerError, err))
 			return
 		}
-		data, err := ruc.Runs.ListPending(r.Context(), r, id)
+		data, err := ruc.Runs.ListPendingByAgentID(r.Context(), r, id)
 		if err != nil {
 			render.JSON(w, r, present.Error(w, r, http.StatusInternalServerError, err))
 			return
