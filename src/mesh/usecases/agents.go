@@ -16,6 +16,7 @@ type AgentsRepository interface {
 	Get(ctx context.Context, id string) (agents models.Agent, err error)
 	List(ctx context.Context) ([]models.Agent, error)
 	ListActive(ctx context.Context) ([]models.Agent, error)
+	ListInactiveSince(ctx context.Context, t time.Time) ([]models.Agent, error)
 	Register(ctx context.Context, agent models.Agent) (models.Agent, error)
 	Deregister(ctx context.Context, id string) (models.Agent, error)
 	Update(ctx context.Context, agent models.Agent) (models.Agent, error)
@@ -73,4 +74,20 @@ func (u *agentsUsecase) Ping(ctx context.Context, r *http.Request, id string) (a
 	}
 	agent.UpdatedAt = time.Now()
 	return u.repo.Update(ctx, agent)
+}
+
+// MarkInactiveAgents checks for agents that didn't make liveness calls > 10 minutes
+// and marks them as inactive
+func (u *agentsUsecase) MarkInactiveAgents(ctx context.Context) error {
+	agents, err := u.repo.ListInactiveSince(ctx, time.Now().Add(time.Minute*time.Duration(-10)))
+	if err != nil {
+		return err
+	}
+	for _, a := range agents {
+		a.Active = false
+		if _, err := u.repo.Update(ctx, a); err != nil {
+			return err
+		}
+	}
+	return nil
 }

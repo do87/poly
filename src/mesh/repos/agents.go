@@ -37,10 +37,10 @@ func (r *agentsRepo) ListActive(ctx context.Context) (agents []models.Agent, err
 	return agents, nil
 }
 
-// ListAgentsSinceFilterByActive returns all agents that haven't been updated since given time, filtered by isActive (bool)
-func (r *agentsRepo) ListAgentsSinceFilterByActive(ctx context.Context, isActive bool, t time.Time) (agent []models.Agent, err error) {
+// ListInactiveSince returns all agents that haven't been active since given time
+func (r *agentsRepo) ListInactiveSince(ctx context.Context, t time.Time) (agent []models.Agent, err error) {
 	result := r.db.
-		Where("active = ?", isActive).
+		Where("active = false").
 		Where("updated_at > ?", t).
 		Find(&agent)
 	if result.Error != nil {
