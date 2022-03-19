@@ -14,15 +14,7 @@ import (
 
 func main() {
 	ctx := context.Background()
-
-	cfg := zap.NewDevelopmentConfig()
-	cfg.EncoderConfig.StacktraceKey = zapcore.OmitKey
-	cfg.EncoderConfig.CallerKey = zapcore.OmitKey
-	cfg.EncoderConfig.TimeKey = zapcore.OmitKey
-	cfg.EncoderConfig.NameKey = zapcore.OmitKey
-	cfg.Level.SetLevel(zapcore.InfoLevel)
-	custom, _ := cfg.Build()
-	log, logsync := logger.NewCustom(custom)
+	log, logsync := logger.NewCustom(getCustomLogger())
 	defer logsync()
 
 	agent.New(agent.Config{
@@ -47,4 +39,15 @@ func getPrivateKey() []byte {
 		panic(err)
 	}
 	return k
+}
+
+func getCustomLogger() *zap.Logger {
+	cfg := zap.NewDevelopmentConfig()
+	cfg.EncoderConfig.StacktraceKey = zapcore.OmitKey
+	cfg.EncoderConfig.CallerKey = zapcore.OmitKey
+	cfg.EncoderConfig.TimeKey = zapcore.OmitKey
+	cfg.EncoderConfig.NameKey = zapcore.OmitKey
+	cfg.Level.SetLevel(zapcore.InfoLevel)
+	custom, _ := cfg.Build()
+	return custom
 }

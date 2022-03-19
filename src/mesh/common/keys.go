@@ -9,7 +9,7 @@ import (
 )
 
 // ProcessRegisterKey processes a registration key using the provided public key
-func ProcessRegisterKey(key models.Key, encodedKey, agentHostname string) error {
+func ProcessRegisterKey(key models.Key, encodedKey, uuid string) error {
 	if time.Now().After(key.ExpiresAt) {
 		return errors.New("given key has expired")
 	}
@@ -21,7 +21,7 @@ func ProcessRegisterKey(key models.Key, encodedKey, agentHostname string) error 
 	if err != nil {
 		return err
 	}
-	if err := auth.ValidateRegisterToken(t, agentHostname); err != nil {
+	if err := auth.ValidateRegisterToken(t, uuid); err != nil {
 		return err
 	}
 	return nil

@@ -112,15 +112,22 @@ func (a *agent) getPlanKeys() []string {
 	return keys
 }
 
+func (a *agent) logAgentInfo() {
+	if a.hostname != "" {
+		a.log.Info("- Hostname: " + a.hostname)
+	}
+	a.log.Info("- Agent UUID: " + a.uuid.String())
+	a.log.Info("- Labels: " + strings.Join(a.labels, ", "))
+	a.log.Info("- Supported Plans: " + strings.Join(a.getPlanKeys(), ", "))
+}
+
 // Run runs the agent
 func (a *agent) Run(ctx context.Context) {
 	ctx, stop := signal.NotifyContext(ctx, os.Interrupt, syscall.SIGTERM)
 	ticker := time.NewTicker(a.PollInterval)
 	a.uuid = uuid.Generate()
-	a.log.Info("⏫ agent starting up:")
-	a.log.Info("- Agent UUID: " + a.uuid.String())
-	a.log.Info("- Labels: " + strings.Join(a.labels, ", "))
-	a.log.Info("- Supported Plans: " + strings.Join(a.getPlanKeys(), ", "))
+	a.log.Info("⏫ agent starting up...")
+	a.logAgentInfo()
 
 	a.log.Info("🔐 registering agent...")
 	res, err := a.registerAgent(ctx)
@@ -147,7 +154,7 @@ func (a *agent) registerAgent(ctx context.Context) ([]byte, error) {
 	if a.client == nil {
 		return nil, errors.New("http client not configured correctly. make sure MeshURL is configured")
 	}
-	enc, err := a.registrationKey.Encode(a.hostname)
+	enc, err := a.registrationKey.Encode(a.uuid.String())
 	if err != nil {
 		return nil, err
 	}

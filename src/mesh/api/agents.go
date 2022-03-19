@@ -53,7 +53,7 @@ func (a *agents) register(u, k *usecases.Usecase) http.HandlerFunc {
 			render.JSON(w, r, present.Error(w, r, http.StatusInternalServerError, err))
 			return
 		}
-		token, err := a.auth.Token(agent.Hostname)
+		token, err := a.auth.Token(agent.UUID)
 		if err != nil {
 			render.JSON(w, r, present.Error(w, r, http.StatusInternalServerError, err))
 			return

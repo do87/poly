@@ -16,15 +16,15 @@ type AgentRegisterKey struct {
 	PrivateKey []byte // private key
 }
 
-// Encode encodes the key the private key and agent hostname
-func (k AgentRegisterKey) Encode(hostname string) (string, error) {
+// Encode encodes the key the private key and agent uuid
+func (k AgentRegisterKey) Encode(uuid string) (string, error) {
 	parsedKey, err := jwt.ParseRSAPrivateKeyFromPEM(k.PrivateKey)
 	if err != nil {
 		return "", err
 	}
 	return jwt.NewWithClaims(jwt.SigningMethodRS256, jwt.MapClaims{
-		"scope":    "agent",
-		"hostname": hostname,
+		"scope": "agent",
+		"uuid":  uuid,
 	}).SignedString(parsedKey)
 }
 
@@ -49,7 +49,7 @@ func (k MeshRegisterKey) Decode(encodedToken string) (*jwt.Token, error) {
 }
 
 // ValidateRegisterToken validates the register token claims
-func ValidateRegisterToken(token *jwt.Token, hostname string) error {
+func ValidateRegisterToken(token *jwt.Token, uuid string) error {
 	claims, ok := token.Claims.(jwt.MapClaims)
 	if !ok {
 		return errors.New("failed to get jwt claims")
@@ -57,7 +57,7 @@ func ValidateRegisterToken(token *jwt.Token, hostname string) error {
 	if scope, ok := claims["scope"]; !ok || scope.(string) != "agent" {
 		return errors.New("jwt scope payload validatation failed")
 	}
-	if host, ok := claims["hostname"]; !ok || host.(string) != hostname {
+	if id, ok := claims["uuid"]; !ok || id.(string) != uuid {
 		return errors.New("jwt host payload validatation failed")
 	}
 	return nil

@@ -40,11 +40,11 @@ func (g *General) SetKey(key []byte) {
 	os.Setenv(MeshGlobalKey, string(g.Key))
 }
 
-// Token returns general JWT token with hostname claim
-func (g *General) Token(hostname string) (string, error) {
+// Token returns general JWT token with uuid claim
+func (g *General) Token(uuid string) (string, error) {
 	atClaims := jwt.MapClaims{}
 	atClaims["authorized"] = true
-	atClaims["hostname"] = hostname
+	atClaims["uuid"] = uuid
 	atClaims["exp"] = time.Now().Add(time.Hour * 24 * 365).Unix()
 	t := jwt.NewWithClaims(jwt.SigningMethodHS256, atClaims)
 	return t.SignedString(g.Key)
@@ -52,7 +52,7 @@ func (g *General) Token(hostname string) (string, error) {
 
 // ValidateGeneralTokenHeader fetches the access token from the authorization header
 // and validates it
-func ValidateGeneralTokenHeader(r *http.Request) (hostname string, err error) {
+func ValidateGeneralTokenHeader(r *http.Request) (uuid string, err error) {
 	t := extractToken(r)
 	token, err := validateToken(t)
 	if err != nil {
@@ -67,13 +67,13 @@ func ValidateGeneralTokenHeader(r *http.Request) (hostname string, err error) {
 		err = errors.New("invalid claims")
 		return
 	}
-	h, ok := claims["hostname"]
+	h, ok := claims["uuid"]
 	if !ok {
-		err = errors.New("invalid hostname")
+		err = errors.New("invalid uuid")
 		return
 	}
-	if hostname, ok = h.(string); !ok {
-		err = errors.New("invalid hostname value type")
+	if uuid, ok = h.(string); !ok {
+		err = errors.New("invalid uuid value type")
 		return
 	}
 	return

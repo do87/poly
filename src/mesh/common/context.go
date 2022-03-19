@@ -8,8 +8,8 @@ import (
 // MeshContextVar is context keys type for mesh API
 type MeshContextVar string
 
-// ContextAgentHostname is the key that will be added to the context
-const ContextAgentHostname MeshContextVar = "hostname"
+// ContextAgentUUID is the key that will be added to the context
+const ContextAgentUUID MeshContextVar = "uuid"
 
 // AddToContext adds a key of type MeshCtxKey and a provided string value to the request context
 func AddToContext(r *http.Request, key MeshContextVar, value string) *http.Request {
