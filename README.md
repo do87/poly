@@ -13,7 +13,7 @@ The project consists of a mesh server which is the single source of truth, and a
 <img src="statics/workflow.png" alt="workflow" align="left">
 <span>
 
-1. The agent registers itself with the API and retrieves an access token
+1. The agent registers itself with the API 
 2. The agent is polling the API periodically, and the API returns a list of runs it needs to execute
 3. When an agent receives a shutdown signal, it makes an API call to deregister itself
 </span>
