@@ -27,7 +27,7 @@ func New(baseURL string) *Client {
 	}
 }
 
-//SetToken sets an authorization bearer token
+// SetToken sets an authorization bearer token
 func (c *Client) SetToken(bearer string) {
 	c.token = bearer
 }

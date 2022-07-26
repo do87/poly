@@ -42,7 +42,7 @@ func New(log logger.Log, db *db.DB, c Config) *API {
 	}
 }
 
-// Register registers the API
+// Register registers API routes using handler functions
 func (a *API) Register(handlers ...Handler) *API {
 	for _, handler := range handlers {
 		handler(a.router, a.db)

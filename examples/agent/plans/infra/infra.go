@@ -29,7 +29,7 @@ func Plan() *agent.Plan {
 
 	p.AddNode(storage)
 	p.AddNode(tfrun)
-	p.ParentOf(storage, tfrun)
+	p.Dependency(storage, tfrun)
 	return p
 }
 

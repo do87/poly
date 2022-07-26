@@ -28,6 +28,7 @@ type Tree struct {
 
 // Node is a node in the polytree
 type Node struct {
+	tree     *Tree
 	Key      string
 	Parents  []*Node
 	Children []*Node
@@ -62,20 +63,16 @@ func (t *Tree) Init() *Tree {
 
 // AddNode adds a node to the polytree
 func (t *Tree) AddNode(node *Node) *Tree {
+	node.tree = t
 	t.nodes = append(t.nodes, node)
 	return t
 }
 
-// AddDependency creates dependencies between nodes
-func (t *Tree) AddDependency(parent, child *Node) *Tree {
+// Dependency creates dependencies between nodes
+func (t *Tree) Dependency(parent, child *Node) *Tree {
 	parent.Children = append(parent.Children, child)
 	child.Parents = append(child.Parents, parent)
 	return t
-}
-
-// ParentOf sets parent-child relationship between nodes
-func (t *Tree) ParentOf(parent, child *Node) *Tree {
-	return t.AddDependency(parent, child)
 }
 
 func (t *Tree) execNode(ctx context.Context, log logger.Log, node *Node, done chan *Node) {
